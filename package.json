@@ -1,0 +1,27 @@
+{
+  "name": "mabani97",
+  "version": "1.0.0",
+  "description": "پروژه مبانی کامپیوتر نیمسال اول سال 97",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/mahdinajiga/mabani97.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mahdinajiga/mabani97/issues"
+  },
+  "homepage": "https://github.com/mahdinajiga/mabani97#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "multer": "^1.4.1",
+    "node-datetime": "^2.1.2"
+  }
+}

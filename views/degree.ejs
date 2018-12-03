@@ -1,0 +1,12 @@
+<div>
+    <select id="degreeName<%- locals.id %>">
+    <% locals.options.forEach(function(option) { %>
+        <option value="<%- option %>"><%- option %></option>
+    <% }); %>
+    </select>
+    
+    <input type="text" placeholder="سال اتمام دوره" id="SalEtmam<%- locals.id %>" required>
+
+    <input type="text" placeholder="توضیحات درمورد مدرک" id="BachName<%- locals.id %>">
+</div>
+<hr>

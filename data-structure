@@ -1,0 +1,26 @@
+submited user database:
+{
+    ShomareDaneshjuyii (number) : BachId
+    CodeMelli * (number)        : CodeMelli
+    Email (string)              : email
+    ShomareTelephone * (string) : TelNum
+    Degree (array of objects)   : Degs
+    Nam (string)                : BachName
+    NamKhanevadegi (string)     : BachLname
+    Bio (string)                : Bio
+}
+    *:  private
+---------------------------------------------------
+
+university database:
+{
+    ShomareDaneshjuyii (number) : BachId
+    CodeMelli (number)          : CodeMelli
+    Degree * (array of objects) : Degs
+    Nam (string)                : BachName
+    NamKhanevadegi (string)     : BachLname
+}
+    *:  ["karshenasi", "arshad", "doktora", "fog-doktora", ...]
+        degree is an object consist of { DegreeName ("arshad", ...) , SalEtmam , Description }
+
+

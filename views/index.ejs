@@ -1,0 +1,188 @@
+<html>
+    <head>
+        <title>mabani97</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- styles from https://www.w3schools.com/howto/howto_js_popup_form.asp-->
+        <style>
+            body {font-family: Arial, Helvetica, sans-serif;}
+            * {box-sizing: border-box;}
+
+            /* Add styles to the form container */
+            .form-container {
+                width: 50vw;
+                margin-right : 25vw;
+                padding: 10px;
+                background-color: white;
+            }
+            
+            /* Full-width input fields */
+            .form-container input[type=text], .form-container input[type=password] {
+                width: 100%;
+                padding: 15px;
+                margin: 5px 0 22px 0;
+                border: 0px solid grey;
+                border-radius: 5px;
+                background: #f1f1f1;
+            }
+            
+            /* When the inputs get focus, do something */
+            .form-container input[type=text]:focus, .form-container input[type=password]:focus {
+                background-color: #ddd;
+                outline: none;
+            }
+            
+            /* Set a style for the submit/login button */
+            .btn {
+                background-color: #e7e7e7;
+                color: black;
+                padding: 16px 20px;
+                border: 1px solid grey;
+                border-radius: 5px;
+                cursor: pointer;
+                width: 100%;
+                margin-bottom:10px;
+                opacity: 0.8;
+            }
+            
+            /* Add some hover effects to buttons */
+            .btn:hover{
+                opacity: 1;
+            }
+        </style>
+    </head>
+    <body dir="rtl">
+        <p><h1 style="text-align: center;">سامانه ثبت اطلاعات فارغ التحصیلان دانشگاه تبریز</h1></p>
+
+        
+
+        <div id="submitForm">
+            <form class="form-container">
+                <h1>ثبت اطلاعات</h1>
+            
+                <label for="BachId"><b>شماره دانشجویی</b></label>
+                <input type="text" placeholder="شماره دانشجویی خود را وارد کنید..." id="BachId" name="BachId" required>
+            
+                <label for="CodeMelli"><b>کد ملی</b></label>
+                <input type="text" placeholder="کد ملی خود را وارد کنید..." id="CodeMelli" name="CodeMelli" required>
+
+                <label for="BachName"><b>نام</b></label>
+                <input type="text" placeholder="" id="BachName" name="BachName" required>
+            
+                <label for="BachLname"><b>نام خانوادگی</b></label>
+                <input type="text" placeholder="" id="BachLname" name="BachLname" required>
+
+                <label for="email"><b>ایمیل</b></label>
+                <input type="text" placeholder="emailaddrees@example.com" id="email" name="email" required>
+
+                <label for="TelNum"><b>شماره تلفن</b></label>
+                <input type="text" placeholder="09141234567" id="TelNum" name="TelNum" required>
+
+                <label for="Bio"><b>Bio</b></label><br>
+                <textarea style="width: 49vw; border: 1px solid grey; border-radius: 5px;" type="text" placeholder="" rows="5" id="Bio" name="Bio"></textarea><br>
+
+                <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px;">
+                <label for="degreesForm"><b>مدارک تحصیلی</b></label>
+                <div style="margin-top: 5vh;" id="degreesForm" name="degreesForm">
+                </div>
+                <input type="button" style="width: 25vw; margin-right: 12vw;" onclick="newDegree()" id="newDegBtn" value="اضافه کردن مدرک تحصیلی" class="btn"/>   
+                </div>
+                <input type="button" style="margin-top: 15vh;" onclick="submitUserClicked()" id="submitBtn" value="ثبت" class="btn"/>
+            </form>
+
+            
+            
+        </div>
+        
+        <script>
+            var DegreeCount = 0;
+            function openForm() {
+                document.getElementById("submitForm").style.display = "block";
+            }
+            
+            function closeForm() {
+                document.getElementById("submitForm").style.display = "none";
+            }
+
+            function submitUserClicked() {
+                document.getElementById("submitBtn").onclick="";
+                var DataComp = 1;
+                var TBachId = document.getElementById("BachId").value,
+                    TCodeMelli = document.getElementById("CodeMelli").value,
+                    TBachName = document.getElementById("BachName").value,
+                    TBachLname = document.getElementById("BachLname").value,
+                    Temail = document.getElementById("email").value,
+                    TTelNum = document.getElementById("TelNum").value,
+                    TBio = document.getElementById("Bio").value;
+                var Degs = [];
+                if(TBachId == "") { DataComp = 0; }
+                if(TCodeMelli == "") { DataComp = 0; }
+                if(TBachName == "") { DataComp = 0; }
+                if(TBachLname == "") { DataComp = 0; }
+                if(Temail == "") { DataComp = 0; }
+                if(TTelNum == "") { DataComp = 0; }
+                if(DegreeCount==0) { DataComp = 0; }
+                for(var i=0; i < DegreeCount && DataComp==1; i++)
+                {
+                    if(document.getElementById("degreeName"+i).value == "" || document.getElementById("SalEtmam"+i).value == "")
+                    {
+                        DataComp=0
+                    }
+                    else
+                    {
+                        Degs.push({
+                            DegreeName : document.getElementById("degreeName"+i).value,
+                            SalEtmam : document.getElementById("SalEtmam"+i).value,
+                            Description : document.getElementById("BachName"+i).value
+                        });
+                    }
+                }
+                if(DataComp==1)
+                {
+                    var xp = new XMLHttpRequest();
+                    document.getElementById("submitBtn").onclick = "";
+                    document.getElementById("submitBtn").value = "لطفا کمی صبر کنید...";
+                    xp.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            var Resp = JSON.parse(this.responseText);
+                            document.getElementById("submitBtn").value = Resp.message;
+                            alert(Resp.message);
+                        }
+                    };
+                    xp.open("POST", "/submitUser");
+                    xp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                    xp.send("Data="+JSON.stringify({ 
+                        BachId : TBachId,
+                        CodeMelli : TCodeMelli,
+                        BachName : TBachName,
+                        BachLname : TBachLname,
+                        email : Temail,
+                        TelNum : TTelNum,
+                        Bio : TBio,
+                        Degrees : Degs,
+                        DegreesCount : DegreeCount
+                     }));
+                }
+                else
+                {
+                    document.getElementById("submitBtn").onclick="submitUserClicked()";
+                    alert("لطفا اطلاعات را به طور کامل وارد کنید!!!");
+                }
+
+            }
+
+            function newDegree() {
+                var xp = new XMLHttpRequest();
+                xp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        var temp = document.getElementById("degreesForm").innerHTML;
+                        document.getElementById("degreesForm").innerHTML = temp + this.responseText;
+                        DegreeCount++;
+                    }
+                };
+                xp.open("POST", "/degree");
+                xp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xp.send("Data="+JSON.stringify({ id: DegreeCount }));
+            }
+        </script>
+    </body>
+</html>
