@@ -90,6 +90,6 @@ app.post('/submitUser', function (req, res) {
     }
 });
 
-app.listen(80,function () {
-    console.log("service started...");
+app.listen(8000,function () {
+    console.log("service started on port 8000...");
 });
