@@ -1,0 +1,12 @@
+<p style="margin-right: 10px;"><span>نام و نام خانوادگی:</span><span><%- BachName %><%- " " %> <%- BachLname %></span></p>
+
+<p style="margin-right: 10px;"><span>شماره دانشجویی:</span><span><%- BachId %></span></p>
+
+<p style="margin-right: 10px;"><span>ایمیل:</span><span><%- email %></span></p>
+
+<% locals.Degs.forEach(function(Deg) { %>
+    <p style="margin-right: 30px;"><span>مقطع <%- Deg.DegreeName %></span><span> سال <%- Deg.SalEtmam %></span></p>
+<% }); %>
+
+<p style="margin-right: 10px;"><span>بیوگرافی:</span><br><span><%- Bio %></span></p>
+

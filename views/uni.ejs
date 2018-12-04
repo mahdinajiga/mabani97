@@ -48,35 +48,10 @@
             .btn:hover{
                 opacity: 1;
             }
-
-            .loader {
-                border: 1vw solid #f3f3f3;
-                border-radius: 50%;
-                left: 50vw;
-                top: 50vh;
-                border-top: 1vw solid #3498db;
-                margin: 0 auto;
-                width: 9vw;
-                height: 9vw;
-                -webkit-animation: spin 2s linear infinite; /* Safari */
-                animation: spin 2s linear infinite;
-            }
-
-            /* Safari */
-            @-webkit-keyframes spin {
-                0% { -webkit-transform: rotate(0deg); }
-                100% { -webkit-transform: rotate(360deg); }
-            }
-
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-
         </style>
     </head>
     <body dir="rtl" onload="">
-        <p><h1 style="text-align: center;">سامانه ثبت اطلاعات فارغ التحصیلان دانشگاه تبریز</h1></p>
+        <p><h1 style="text-align: center;">سامانه ثبت اطلاعات فارغ التحصیلان دانشگاه تبریز (نسخه دانشگاهی)</h1></p>
 
         
 
@@ -96,15 +71,6 @@
                 <label for="BachLname"><b>نام خانوادگی</b></label>
                 <input type="text" placeholder="" id="BachLname" name="BachLname" required>
 
-                <label for="email"><b>ایمیل</b></label>
-                <input type="text" placeholder="emailaddrees@example.com" id="email" name="email" required>
-
-                <label for="TelNum"><b>شماره تلفن</b></label>
-                <input type="text" placeholder="09141234567" id="TelNum" name="TelNum" required>
-
-                <label for="Bio"><b>Bio</b></label><br>
-                <textarea style="width: 49vw; border: 1px solid grey; border-radius: 5px;" type="text" placeholder="" rows="5" id="Bio" name="Bio"></textarea><br>
-
                 <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px;">
                 <label for="degreesForm"><b>مدارک تحصیلی</b></label>
                 <div style="margin-top: 5vh;" id="degreesForm" name="degreesForm">
@@ -115,58 +81,9 @@
             </form>    
         </div>
         <hr>
-
-
-
-
-
-        <div id="searchForm">
-            <form style="width: 75vw; margin-right: 12vw;" class="form-container">
-                <h1>جستجوی اطلاعات</h1>
-
-                <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px;">
-                    <br>
-                    <input type="text" placeholder="شماره دانشجویی" id="SearchBachId" style="width: 48vw;">
-                    <input type="button"  onclick="searchConfirmedUserById()" id="submitBtn" value="جستجو بر اساس شماره دانشجویی" class="btn pull-left" style="width: 25vw;margin-left = 0px;"/>
-                    <div id="BachIdResult" style="display: none; left: 50%; width: 50%; margin-right: 25%; margin-bottom: 2%; border: 1px solid grey; border-radius: 5px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                </div>
-                
-            </form>    
-            
-
-            </div>
-            
-        </div>
-            <form style="width: 75vw; margin-right: 12vw;" class="form-container">
-                <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px;">
-                    <br>
-                    <input type="text" placeholder="جسنجو در بیو" id="SearchBio" style="width: 48vw;">
-                    <input type="button"  onclick="searchConfirmedUserByBio()" id="submitBtn" value="جستجو بر اساس اطلاعات" class="btn pull-left" style="width: 25vw;margin-left = 0px;"/>
-                    <span> رشته
-                    <select id="SearchDegreeName">
-                        <option value="0">مهم نیست</option>
-                    <% locals.options.forEach(function(option) { %>
-                        <option value="<%- option %>"><%- option %></option>
-                    <% }); %>
-                    </select>
-                    سال فارغ التحصیلی 
-                    <input type="text" placeholder="97" id="SearchSalEtmam" style="width: 100px; text-align: center;">
-                    </span>
-                    <div id="BioResult" style="display: none; left: 50%; width: 50%; margin-right: 25%; margin-bottom: 2%; border: 1px solid grey; border-radius: 5px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                </div>
-            </div>
-
-
-            <div id="loaderIco" style="display:none;" class="loader"></div>
+        
         <script>
             var DegreeCount = 0;
-            function openForm() {
-                document.getElementById("submitForm").style.display = "block";
-            }
-            
-            function closeForm() {
-                document.getElementById("submitForm").style.display = "none";
-            }
 
             function submitUserClicked() {
                 document.getElementById("submitBtn").onclick="";
@@ -174,18 +91,12 @@
                 var TBachId = document.getElementById("BachId").value,
                     TCodeMelli = document.getElementById("CodeMelli").value,
                     TBachName = document.getElementById("BachName").value,
-                    TBachLname = document.getElementById("BachLname").value,
-                    Temail = document.getElementById("email").value,
-                    TTelNum = document.getElementById("TelNum").value,
-                    TBio = document.getElementById("Bio").value;
+                    TBachLname = document.getElementById("BachLname").value;
                 var Degs = [];
                 if(TBachId == "") { DataComp = 0; }
                 if(TCodeMelli == "") { DataComp = 0; }
-                if(TBachName == "") { DataComp = 0; }
-                if(TBachLname == "") { DataComp = 0; }
-                if(Temail == "") { DataComp = 0; }
-                if(TTelNum == "") { DataComp = 0; }
-                if(DegreeCount==0) { DataComp = 0; }
+                if(TBachName == "") { TBachName = "نام وارد نشده"; }
+                if(TBachLname == "") { TBachLname = "نام خانوادگی وارد نشده"; }
                 for(var i=0; i < DegreeCount && DataComp==1; i++)
                 {
                     if(document.getElementById("degreeName"+i).value == "" || document.getElementById("SalEtmam"+i).value == "")
@@ -213,16 +124,13 @@
                             alert(Resp.message);
                         }
                     };
-                    xp.open("POST", "/submitUser");
+                    xp.open("POST", "/confirmUser");
                     xp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                     xp.send("Data="+JSON.stringify({ 
                         BachId : TBachId,
                         CodeMelli : TCodeMelli,
                         BachName : TBachName,
                         BachLname : TBachLname,
-                        email : Temail,
-                        TelNum : TTelNum,
-                        Bio : TBio,
                         Degrees : Degs,
                         DegreesCount : DegreeCount
                      }));
