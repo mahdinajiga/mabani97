@@ -2,6 +2,7 @@
     <head>
         <title>mabani97</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <!-- styles from https://www.w3schools.com/howto/howto_js_popup_form.asp-->
         <style>
             body {font-family: Arial, Helvetica, sans-serif;}
@@ -31,7 +32,7 @@
                 outline: none;
             }
             
-            /* Set a style for the submit/login button */
+            /* Set a style for the submit button */
             .btn {
                 background-color: #e7e7e7;
                 color: black;
@@ -49,20 +50,32 @@
                 opacity: 1;
             }
 
+            #BachIdResult {
+                display: none;
+                left: 50%;
+                width: 50%;
+                padding: 10px;
+                margin-right: 25%;
+                margin-bottom: 2%;
+                border: 1px solid grey;
+                border-radius: 5px;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            }
+
+            /* loader effects for waitings*/
             .loader {
                 border: 1vw solid #f3f3f3;
                 border-radius: 50%;
-                left: 50vw;
-                top: 50vh;
+                left: 50%;
+                top: 50%;
                 border-top: 1vw solid #3498db;
                 margin: 0 auto;
                 width: 9vw;
                 height: 9vw;
-                -webkit-animation: spin 2s linear infinite; /* Safari */
+                -webkit-animation: spin 2s linear infinite;
                 animation: spin 2s linear infinite;
             }
 
-            /* Safari */
             @-webkit-keyframes spin {
                 0% { -webkit-transform: rotate(0deg); }
                 100% { -webkit-transform: rotate(360deg); }
@@ -72,7 +85,6 @@
                 0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
             }
-
         </style>
     </head>
     <body dir="rtl" onload="">
@@ -103,15 +115,16 @@
                 <input type="text" placeholder="09141234567" id="TelNum" name="TelNum" required>
 
                 <label for="Bio"><b>Bio</b></label><br>
-                <textarea style="width: 49vw; border: 1px solid grey; border-radius: 5px;" type="text" placeholder="" rows="5" id="Bio" name="Bio"></textarea><br>
+                <textarea style="width: 100%; border: 1px solid grey; border-radius: 5px;" type="text" placeholder="" rows="5" id="Bio" name="Bio"></textarea>
 
-                <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px;">
-                <label for="degreesForm"><b>مدارک تحصیلی</b></label>
-                <div style="margin-top: 5vh;" id="degreesForm" name="degreesForm">
+                <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px; padding: 10px;">
+                    <label for="degreesForm"><b>مدارک تحصیلی</b></label>
+                    <div style="margin-top: 5vh;" id="degreesForm" name="degreesForm">
+
+                    </div>
+                    <input type="button" style="width: 50%; margin: 10px 25% 10px 25%;" onclick="newDegree()" id="newDegBtn" value="اضافه کردن مدرک تحصیلی" class="btn"/>   
                 </div>
-                <input type="button" style="width: 25vw; margin-right: 12vw;" onclick="newDegree()" id="newDegBtn" value="اضافه کردن مدرک تحصیلی" class="btn"/>   
-                </div>
-                <input type="button" style="margin-top: 15vh;" onclick="submitUserClicked()" id="submitBtn" value="ثبت" class="btn"/>
+                <input type="button" style="margin-top: 10vh;" onclick="submitUserClicked()" id="submitBtn" value="ثبت" class="btn"/>
             </form>    
         </div>
         <hr>
@@ -121,43 +134,38 @@
 
 
         <div id="searchForm">
-            <form style="width: 75vw; margin-right: 12vw;" class="form-container">
+            <form style="width: 75vw; margin: auto;" class="form-container">
                 <h1>جستجوی اطلاعات</h1>
-
-                <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px;">
-                    <br>
-                    <input type="text" placeholder="شماره دانشجویی" id="SearchBachId" style="width: 48vw;">
-                    <input type="button"  onclick="searchConfirmedUserById()" id="submitBtn" value="جستجو بر اساس شماره دانشجویی" class="btn pull-left" style="width: 25vw;margin-left = 0px;"/>
-                    <div id="BachIdResult" style="display: none; left: 50%; width: 50%; margin-right: 25%; margin-bottom: 2%; border: 1px solid grey; border-radius: 5px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px; padding: 15px;">
+                    <input type="text" placeholder="شماره دانشجویی" id="SearchBachId" style="width: 70%; margin-right: 15px;">
+                    <input type="button"  onclick="searchConfirmedUserById()" id="submitBtn" value="جستجو بر اساس شماره دانشجویی" class="btn pull-left" style="width: 25%; left = 0px;"/>
+                    <div id="BachIdResult">
                 </div>
-                
             </form>    
-            
-
-            </div>
-            
         </div>
-            <form style="width: 75vw; margin-right: 12vw;" class="form-container">
-                <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px;">
-                    <br>
-                    <input type="text" placeholder="جسنجو در بیو" id="SearchBio" style="width: 48vw;">
-                    <input type="button"  onclick="searchConfirmedUserByBio()" id="submitBtn" value="جستجو بر اساس اطلاعات" class="btn pull-left" style="width: 25vw;margin-left = 0px;"/>
-                    <span> رشته
-                    <select id="SearchDegreeName">
-                        <option value="0">مهم نیست</option>
-                    <% locals.options.forEach(function(option) { %>
-                        <option value="<%- option %>"><%- option %></option>
-                    <% }); %>
-                    </select>
-                    سال فارغ التحصیلی 
-                    <input type="text" placeholder="97" id="SearchSalEtmam" style="width: 100px; text-align: center;">
-                    </span>
-                    <div id="BioResult" style="display: none; left: 50%; width: 50%; margin-right: 25%; margin-bottom: 2%; border: 1px solid grey; border-radius: 5px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                </div>
+            
+
+        <div style="width: 75vw; margin: auto; padding: 15px; margin-bottom: 300px;" class="form-container">
+            <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px;">
+                <input type="text" placeholder="جسنجو در بیو" id="SearchBio" style="width: 70%; margin-right: 15px;">
+                <input type="button" onclick="searchConfirmedUserByBio()" id="submitBtn" value="جستجو بر اساس اطلاعات" class="btn pull-left" style="width: 25%; left = 0px;"/>
+                <p>رشته
+                <select style="margin-left: 20px;" id="SearchDegreeName">
+                    <option value="0">مهم نیست</option>
+                <% locals.options.forEach(function(option) { %>
+                    <option value="<%- option %>"><%- option %></option>
+                <% }); %>
+                </select>
+                سال فارغ التحصیلی 
+                <input type="text" placeholder="97" id="SearchSalEtmam" style="width: 100px; text-align: center;">
+                </p>
+                <div id="BioResult" style="display: none; left: 50%; width: 50%; margin-right: 25%; margin-bottom: 2%; border: 1px solid grey; border-radius: 5px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                
             </div>
+        </div>
 
 
-            <div id="loaderIco" style="display:none;" class="loader"></div>
+            <div id="loaderIco" style="display:none; position: fixed;" class="loader"></div>
         <script>
             var DegreeCount = 0;
             function openForm() {

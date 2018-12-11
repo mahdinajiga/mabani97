@@ -2,6 +2,7 @@
     <head>
         <title>mabani97</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <!-- styles from https://www.w3schools.com/howto/howto_js_popup_form.asp-->
         <style>
             body {font-family: Arial, Helvetica, sans-serif;}
@@ -71,11 +72,12 @@
                 <label for="BachLname"><b>نام خانوادگی</b></label>
                 <input type="text" placeholder="" id="BachLname" name="BachLname" required>
 
-                <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px;">
-                <label for="degreesForm"><b>مدارک تحصیلی</b></label>
-                <div style="margin-top: 5vh;" id="degreesForm" name="degreesForm">
-                </div>
-                <input type="button" style="width: 25vw; margin-right: 12vw;" onclick="newDegree()" id="newDegBtn" value="اضافه کردن مدرک تحصیلی" class="btn"/>   
+                <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px; padding: 10px;">
+                    <label for="degreesForm"><b>مدارک تحصیلی</b></label>
+                    <div style="margin-top: 5vh;" id="degreesForm" name="degreesForm">
+
+                    </div>
+                    <input type="button" style="width: 50%; margin: 10px 25% 10px 25%;" onclick="newDegree()" id="newDegBtn" value="اضافه کردن مدرک تحصیلی" class="btn"/>   
                 </div>
                 <input type="button" style="margin-top: 15vh;" onclick="submitUserClicked()" id="submitBtn" value="ثبت" class="btn"/>
             </form>    
@@ -137,7 +139,7 @@
                 }
                 else
                 {
-                    document.getElementById("submitBtn").onclick="submitUserClicked()";
+                    document.getElementById("submitBtn").onclick="submitUserClicked();";
                     alert("لطفا اطلاعات را به طور کامل وارد کنید!!!");
                 }
 

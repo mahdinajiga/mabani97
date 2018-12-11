@@ -1,11 +1,8 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
-var multer = require('multer');
-const fs = require('fs');
-var dateTime = require('node-datetime');
 
-var DatabaseMS = require('./DBMS');
+var DatabaseMS = require('./DBMS'); // adding database management system module
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -13,12 +10,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', './views');
 
-DatabaseMS.init('./Nodes');
+DatabaseMS.init('./Nodes'); // calling init() on DBMS
 
-var OptionValues = ["کارشناسی", "کارشناسی ارشد", "دکترا", "فوق دکترا"];
+var OptionValues = ["کارشناسی", "کارشناسی ارشد", "دکترا", "فوق دکترا"]; // DegreeTypes
 
+
+
+/*
+    GET /
+    rendering index.htm for response
+
+    صفحه اصلی سایت برای تمامی کاربران
+*/
 app.get('/', function (req, res) {
-    if(req.query.reqid)
+    if(req.query.reqid) //look if there is reqid, if there is no reqid, redirect user
     {
         res.render('index', { options : OptionValues });
     }
@@ -28,6 +33,18 @@ app.get('/', function (req, res) {
     }
 });
 
+
+
+
+
+
+
+/*
+    GET /uni
+    same as index but for submitting database records
+
+    صفحه ثبت اطلاعات قدیمی برای کارمندان دانشگاه
+*/
 app.get('/uni', function (req, res) {
     if(req.query.reqid)
     {
@@ -39,16 +56,42 @@ app.get('/uni', function (req, res) {
     }
 });
 
+
+
+
+
+
+
+/*
+    POST /degree
+    rendering degree.htm for every uniqe id
+
+
+    ساخت فرم جدید برای مدارک ثبتی
+    حاوی قسمت انتخاب نام مدرک و توضیحات و سال اخذ مدرک
+    هر ورودی شامل نام ورودی و id
+*/
 app.post('/degree', function (req, res) {
-    console.log("degree");
     var IncomingData = JSON.parse(req.body.Data); // parsing incoming data in JSON
     res.render('degree', { id: IncomingData.id, options : OptionValues });
 });
 
+
+
+
+
+
+
+/*
+    POST /submitUser
+
+    ثبت اطلاعات دانشجو
+    پس از مطمئن شدن از اینکه کاربر قبلا ثبت نشده، اطلاعات ورودی در دیتابیس دانشگاه جستجو میشود
+    اگر دانشجو تایید شده باشد، اطلاعات ورودی در دیتا بیس کنونی دخیره میشود
+*/
 app.post('/submitUser', function (req, res) {
-    console.log("submitUser");
     var IncomingData = JSON.parse(req.body.Data); // parsing incoming data in JSON
-    var DataComp = 1;
+    var DataComp = 1; // data complete flag
     var TBachId = IncomingData.BachId,
         TCodeMelli = IncomingData.CodeMelli,
         TBachName = IncomingData.BachName,
@@ -67,7 +110,7 @@ app.post('/submitUser', function (req, res) {
     if(TDegsCount==0) { DataComp = 0; }
     if(DataComp==0)
     {
-        res.send("");
+        res.send(""); // wrong inputs detected
     }
     else
     {
@@ -101,8 +144,19 @@ app.post('/submitUser', function (req, res) {
     }
 });
 
+
+
+
+
+
+
+/*
+    POST /confirmUser
+
+    ثبت اطلاعات دانشجو در دیتابیس دانشگاه
+    اگر دانشجو تایید شده باشد، اطلاعات ورودی در دیتا بیس کنونی دخیره میشود
+*/
 app.post('/confirmUser', function (req, res) {
-    console.log("confirmUser");
     var IncomingData = JSON.parse(req.body.Data); // parsing incoming data in JSON
     var DataComp = 1;
     var TBachId = IncomingData.BachId,
@@ -118,13 +172,13 @@ app.post('/confirmUser', function (req, res) {
     if(TDegsCount==0) { DataComp = 0; }
     if(DataComp==0)
     {
-        res.send("");
+        res.send(""); // wrong inputs detected
     }
     else
     {
         if(DatabaseMS.confirmedUserExists(TBachId) == 1)
         {
-            res.send(JSON.stringify({ message: "اطلاعات شما قبلا ثبت شده !!!" }));
+            res.send(JSON.stringify({ message: "اطلاعات دانشچو قبلا ثبت شده !!!" }));
         }
         else
         {
@@ -137,13 +191,23 @@ app.post('/confirmUser', function (req, res) {
                 DegsCount: TDegsCount
             };
             DatabaseMS.confirmUser(TBachId, Bach);
-            res.send(JSON.stringify({ message: "اطلاعات شما با موفقیت ثبت شد..." }));
+            res.send(JSON.stringify({ message: "اطلاعات دانشجو با موفقیت ثبت شد..." }));
         }
     }
 });
 
+
+
+
+
+
+
+/*
+    POST /searchUserById
+
+    جستجوی دانشجو بر اساس شماره دانشجویی در دیتابیس کنونی و نمایش نتیجه
+*/
 app.post('/searchUserById', function (req, res) {
-    console.log("searchUserById");
     var IncomingData = JSON.parse(req.body.Data); // parsing incoming data in JSON
     if(DatabaseMS.submitedUserExists(IncomingData.id)==1)
     {
@@ -156,12 +220,28 @@ app.post('/searchUserById', function (req, res) {
     }
 });
 
+
+
+
+
+
+
+
+
+/*
+    POST /searchUserByBio
+
+    جستجوی دانشجو بر اساس قسمتی از بیو و مدارک در دیتابیس کنونی و نمایش نتیجه
+*/
 app.post('/searchUserByBio', function (req, res) {
     console.log("searchUserByBio");
     var IncomingData = JSON.parse(req.body.Data); // parsing incoming data in JSON
     res.render('foundUserByBio',{ Users: DatabaseMS.SearchUserByBioWord(IncomingData)});
 });
 
+
+
+// ruuning web service on port 8000
 app.listen(8000,function () {
     console.log("service started on port 8000...");
 });
