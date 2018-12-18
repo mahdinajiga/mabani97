@@ -5,7 +5,7 @@
 
         <!-- styles from https://www.w3schools.com/howto/howto_js_popup_form.asp-->
         <style>
-            body {font-family: Arial, Helvetica, sans-serif;}
+            body {font-family: Arial, Roya, Helvetica, sans-serif;}
             * {box-sizing: border-box;}
 
             /* Add styles to the form container */
@@ -85,6 +85,15 @@
                 0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
             }
+
+            @font-face {
+                font-family: 'Roya';
+                src: url('font/Roya.eot?#') format('eot'),  
+                    url('font/Roya.woff') format('woff'),
+                    url('font/Roya.ttf') format('truetype');
+                font-style:normal;
+                font-weight:normal;
+            }
         </style>
     </head>
     <body dir="rtl" onload="">
@@ -98,6 +107,10 @@
             
                 <label for="BachId"><b>شماره دانشجویی</b></label>
                 <input type="text" placeholder="شماره دانشجویی خود را وارد کنید..." id="BachId" name="BachId" required>
+
+                <a href="/searchByName" target="blank">
+                <button type="button" style="width: 30%; margin: -10px 70% 10px 0%; padding: 5px 5px;" id="BachIdForg" class="btn">
+                فراموشی شماره دانشجویی</button></a>
             
                 <label for="CodeMelli"><b>کد ملی</b></label>
                 <input type="text" placeholder="کد ملی خود را وارد کنید..." id="CodeMelli" name="CodeMelli" required>
@@ -117,6 +130,7 @@
                 <label for="Bio"><b>Bio</b></label><br>
                 <textarea style="width: 100%; border: 1px solid grey; border-radius: 5px;" type="text" placeholder="" rows="5" id="Bio" name="Bio"></textarea>
 
+<!--
                 <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px; padding: 10px;">
                     <label for="degreesForm"><b>مدارک تحصیلی</b></label>
                     <div style="margin-top: 5vh;" id="degreesForm" name="degreesForm">
@@ -124,6 +138,7 @@
                     </div>
                     <input type="button" style="width: 50%; margin: 10px 25% 10px 25%;" onclick="newDegree()" id="newDegBtn" value="اضافه کردن مدرک تحصیلی" class="btn"/>   
                 </div>
+                -->
                 <input type="button" style="margin-top: 10vh;" onclick="submitUserClicked()" id="submitBtn" value="ثبت" class="btn"/>
             </form>    
         </div>
@@ -139,8 +154,12 @@
                 <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px; padding: 15px;">
                     <input type="text" placeholder="شماره دانشجویی" id="SearchBachId" style="width: 70%; margin-right: 15px;">
                     <input type="button"  onclick="searchConfirmedUserById()" id="submitBtn" value="جستجو بر اساس شماره دانشجویی" class="btn pull-left" style="width: 25%; left = 0px;"/>
+                    <a href="/searchByName" target="blank">
+                <button type="button" style="width: 30%; margin: -10px 70% 10px 0%; padding: 5px 5px;" id="BachIdForg" class="btn">
+                جستجو بر اساس نام و نام خانوادگی</button></a>
                     <div id="BachIdResult">
                 </div>
+                
             </form>    
         </div>
             
@@ -167,7 +186,6 @@
 
             <div id="loaderIco" style="display:none; position: fixed;" class="loader"></div>
         <script>
-            var DegreeCount = 0;
             function openForm() {
                 document.getElementById("submitForm").style.display = "block";
             }
@@ -193,7 +211,8 @@
                 if(TBachLname == "") { DataComp = 0; }
                 if(Temail == "") { DataComp = 0; }
                 if(TTelNum == "") { DataComp = 0; }
-                if(DegreeCount==0) { DataComp = 0; }
+                //if(DegreeCount==0) { DataComp = 0; }
+                /*
                 for(var i=0; i < DegreeCount && DataComp==1; i++)
                 {
                     if(document.getElementById("degreeName"+i).value == "" || document.getElementById("SalEtmam"+i).value == "")
@@ -209,6 +228,7 @@
                         });
                     }
                 }
+                */
                 if(DataComp==1)
                 {
                     var xp = new XMLHttpRequest();
@@ -230,9 +250,9 @@
                         BachLname : TBachLname,
                         email : Temail,
                         TelNum : TTelNum,
-                        Bio : TBio,
+                        Bio : TBio/*,
                         Degrees : Degs,
-                        DegreesCount : DegreeCount
+                        DegreesCount : DegreeCount*/
                      }));
                 }
                 else

@@ -1,4 +1,5 @@
 const fs = require('fs');
+var stringSimilarity = require('string-similarity');
 var NodesDir; // database root address
 
 
@@ -8,7 +9,9 @@ var init = function () {
         fs.mkdirSync(NodesDir);
         fs.mkdirSync(NodesDir+"/submiteds");
         fs.mkdirSync(NodesDir+"/uniDatabase");
+        fs.writeFileSync(NodesDir + "/NameBachSims.json", JSON.stringify({BachCount : 0, BacheInfo:[]}));
     }
+    console.log("Database management service initialized...")
 }
 
 
@@ -69,6 +72,7 @@ var submitedUserConfirmed = function () {
             }
             else
             {
+                return 1;
                 var Degs = arguments[2]; // user given degrees to check
                 var UniDegs = BachOnUniDatabase.Degs; // uni database degrees confirmed for user
                 var ResOfDegreeConfirm = 1; // user given data confirm flag
@@ -79,13 +83,13 @@ var submitedUserConfirmed = function () {
                     {
                         if(UniDegs[j].DegreeName == Degs[i].DegreeName && UniDegs[j].SalEtmam == Degs[i].SalEtmam)
                         {
-                            console.log("deg found: "+ Degs[i].DegreeName + " on " + Degs[i].SalEtmam)
+                            //console.log("deg found: "+ Degs[i].DegreeName + " on " + Degs[i].SalEtmam)
                             DegreeFound = 1; // this degree is confirmed by university
                         }
                     }
                     if(DegreeFound==0)
                     {
-                        console.log("deg not found: "+ Degs[i].DegreeName + " on "+Degs[i].SalEtmam)
+                        //console.log("deg not found: "+ Degs[i].DegreeName + " on "+Degs[i].SalEtmam)
                         ResOfDegreeConfirm = 0; // one of degrees are wrong (not confirmed by university)
                     }
                 }
@@ -164,14 +168,25 @@ var confirmedUserExists = function () {
         Bach        :   arguments[1]    :   تمامی اطلاعات دانشجویی
 */
 var confirmUser = function () {
-   fs.writeFileSync(NodesDir + "/uniDatabase/" + arguments[0], JSON.stringify(arguments[1]));
+    var BachInfo = arguments[1];
+    fs.writeFileSync(NodesDir + "/uniDatabase/" + arguments[0], JSON.stringify(arguments[1]));
+    var NameB = JSON.parse(fs.readFileSync(NodesDir + "/NameBachSims.json"));
+    var BInfo = NameB.BacheInfo;
+    BInfo[NameB.BachCount] = {
+        BachId: arguments[0],
+        BachName: BachInfo.BachName,
+        BachLname: BachInfo.BachLname
+    };
+    NameB.BachCount = NameB.BachCount+1;
+    NameB.BacheInfo = BInfo;
+    fs.writeFileSync(NodesDir + "/NameBachSims.json", JSON.stringify(NameB));
 }
 
 
 
 
 /*
-    تائید کاربر و ذخیره اطلاعات در دیتابیس کنونی
+    به دست اوردن اطلاعات دانشجو از دیتابیس کنونی بر اساس شماره دانشجویی
 
 
     inputs:
@@ -181,8 +196,27 @@ var confirmUser = function () {
         Bach        :   Object          :   اطلاعات دانشجو
 */
 var GetUserInfo = function () {
-    //console.log(arguments[0]);
     return JSON.parse(fs.readFileSync(NodesDir + "/submiteds/" + arguments[0]));
+}
+
+
+
+
+
+
+
+/*
+    به دست اوردن اطلاعات دانشجو از دیتابیس دانشگاه بر اساس شماره دانشجویی
+
+
+    inputs:
+        BachId      :   arguments[0]    :   شماره دانشجویی
+
+    outputs:
+        Bach        :   Object          :   اطلاعات دانشجو
+*/
+var GetconfirmedUserInfo = function () {
+    return JSON.parse(fs.readFileSync(NodesDir + "/uniDatabase/" + arguments[0]));
 }
 
 
@@ -283,6 +317,58 @@ var SearchUserByBioWord = function () {
 
 
 
+
+
+
+/*
+    جستجوی دانشجو بر اساس تام و نام خانوادگی
+
+    همه رکورد های دیتابیس دانشگاه فراخوانی شده و درصد تشابه نام و نام خانوادگی وارد شده از طرف کاربر با
+    همه رکورد ها بررسی میشود
+    در صورت تشابه زیاد شماره دانشجویی های ممکن برای کاربر نشان داده میشود
+
+    inputs:
+        QueryObj    :   arguments[0]    :   شامل متن جستجو و نوع مدرک و سال فارغ التحصیلی
+            QueryObj.name       :   نام 
+            QueryObj.lname      :   نام خانوادگی
+
+    outputs:
+        ReturnObj   :   Array of Bach ids  :   آرایه ای از شماره دانشجویی و نام و نام خانوادگی در ابجکت
+*/
+var MatchThresholde = .6; // حداقل میزان تشابه بین اسامی از صفر تا یک
+var SearchUserByName = function () {
+    var QueryObj = arguments[0];
+    var ReturnObj = [];
+    if(QueryObj.name != "" || QueryObj.lname != "") // take look if query is wrong
+    {
+        var NameB = JSON.parse(fs.readFileSync(NodesDir + "/NameBachSims.json"));
+        var BInfo = NameB.BacheInfo;
+        for(var i=0; i< NameB.BachCount; i++)
+        {
+            var LNamesimilarity = stringSimilarity.compareTwoStrings(QueryObj.lname, BInfo[i].BachLname);
+            if(LNamesimilarity > MatchThresholde)
+            {
+                var Namesimilarity = stringSimilarity.compareTwoStrings(QueryObj.name, BInfo[i].BachName);
+                if(Namesimilarity > MatchThresholde)
+                {
+                    ReturnObj.push(BInfo[i]);
+                }
+            }
+        }
+    }
+    return ReturnObj;
+}
+
+
+
+
+
+
+
+
+
+
+
 module.exports.init = init;
 module.exports.submitedUserExists = submitedUserExists;
 module.exports.submitedUserConfirmed = submitedUserConfirmed;
@@ -290,4 +376,6 @@ module.exports.submitUser = submitUser;
 module.exports.confirmedUserExists = confirmedUserExists;
 module.exports.confirmUser = confirmUser;
 module.exports.GetUserInfo = GetUserInfo;
+module.exports.GetconfirmedUserInfo = GetconfirmedUserInfo;
 module.exports.SearchUserByBioWord = SearchUserByBioWord;
+module.exports.SearchUserByName = SearchUserByName;

@@ -16,6 +16,21 @@ var OptionValues = ["کارشناسی", "کارشناسی ارشد", "دکترا
 
 
 
+
+
+app.get('/font/Roya.eot', function (req, res) {
+    res.sendFile(__dirname + "/font/Roya.eot");
+});
+app.get('/font/Roya.ttf', function (req, res) {
+    res.sendFile(__dirname + "/font/Roya.ttf");
+});
+app.get('/font/Roya.woff', function (req, res) {
+    res.sendFile(__dirname + "/font/Roya.woff");
+});
+
+
+
+
 /*
     GET /
     rendering index.htm for response
@@ -30,6 +45,27 @@ app.get('/', function (req, res) {
     else
     {
         res.redirect("/?reqid=564");
+    }
+});
+
+
+
+
+
+
+/*
+    GET /searchByName
+
+    جستجوی دانشجو بر اساس شماره نام و نام خانوادگی در دیتابیس دانشگاه و نمایش شماره دانشجویی
+*/
+app.get('/searchByName', function (req, res) {
+    if(req.query.reqid) //look if there is reqid, if there is no reqid, redirect user
+    {
+        res.render('SearchBI');
+    }
+    else
+    {
+        res.redirect("/searchByName?reqid=654");
     }
 });
 
@@ -98,16 +134,16 @@ app.post('/submitUser', function (req, res) {
         TBachLname = IncomingData.BachLname,
         Temail = IncomingData.email,
         TTelNum = IncomingData.TelNum,
-        TBio = IncomingData.Bio,
+        TBio = IncomingData.Bio/*,
         TDegs = IncomingData.Degrees,
-        TDegsCount = IncomingData.DegreesCount;
+        TDegsCount = IncomingData.DegreesCount*/;
     if(TBachId == "") { DataComp = 0; }
     if(TCodeMelli == "") { DataComp = 0; }
     if(TBachName == "") { DataComp = 0; }
     if(TBachLname == "") { DataComp = 0; }
     if(Temail == "") { DataComp = 0; }
     if(TTelNum == "") { DataComp = 0; }
-    if(TDegsCount==0) { DataComp = 0; }
+    //if(TDegsCount==0) { DataComp = 0; }
     if(DataComp==0)
     {
         res.send(""); // wrong inputs detected
@@ -120,8 +156,9 @@ app.post('/submitUser', function (req, res) {
         }
         else
         {
-            if(DatabaseMS.submitedUserConfirmed(TBachId, TCodeMelli, TDegs, TDegsCount) == 1) // confirmed on uni database
+            if(DatabaseMS.submitedUserConfirmed(TBachId, TCodeMelli) == 1) // confirmed on uni database
             {
+                var UniBachData = DatabaseMS.GetconfirmedUserInfo(TBachId);
                 var Bach = {
                     BachId: TBachId,
                     CodeMelli: TCodeMelli,
@@ -130,8 +167,8 @@ app.post('/submitUser', function (req, res) {
                     email: Temail,
                     TelNum: TTelNum,
                     Bio: TBio,
-                    Degs: TDegs,
-                    DegsCount: TDegsCount
+                    Degs: UniBachData.Degs,
+                    DegsCount: UniBachData.DegsCount
                 };
                 DatabaseMS.submitUser(TBachId, Bach);
                 res.send(JSON.stringify({ message: "اطلاعات شما با موفقیت ثبت شد..." }));
@@ -143,6 +180,11 @@ app.post('/submitUser', function (req, res) {
         }
     }
 });
+
+
+
+
+
 
 
 
@@ -228,13 +270,40 @@ app.post('/searchUserById', function (req, res) {
 
 
 
+
+
+/*
+    POST /searchUserByName
+
+    جستجوی دانشجو بر اساس شماره نام و نام خانوادگی در دیتابیس دانشگاه و نمایش شماره دانشجویی
+*/
+app.post('/searchUserByName', function (req, res) {
+    try
+    {
+        var IncomingData = JSON.parse(req.body.Data); // parsing incoming data in JSON
+        var foundUsers = DatabaseMS.SearchUserByName({name : IncomingData.name, lname: IncomingData.lname});
+        res.render('SearchBI-Res', {Users: foundUsers});
+    }
+    catch(ert)
+    {
+        console.log(ert);
+    }
+});
+
+
+
+
+
+
+
+
+
 /*
     POST /searchUserByBio
 
     جستجوی دانشجو بر اساس قسمتی از بیو و مدارک در دیتابیس کنونی و نمایش نتیجه
 */
 app.post('/searchUserByBio', function (req, res) {
-    console.log("searchUserByBio");
     var IncomingData = JSON.parse(req.body.Data); // parsing incoming data in JSON
     res.render('foundUserByBio',{ Users: DatabaseMS.SearchUserByBioWord(IncomingData)});
 });
@@ -243,5 +312,5 @@ app.post('/searchUserByBio', function (req, res) {
 
 // ruuning web service on port 8000
 app.listen(8000,function () {
-    console.log("service started on port 8000...");
+    console.log("web service started on port 8000...");
 });

@@ -124,6 +124,7 @@
                             var Resp = JSON.parse(this.responseText);
                             document.getElementById("submitBtn").value = Resp.message;
                             alert(Resp.message);
+                            window.location.replace("/uni?reqid=748");
                         }
                     };
                     xp.open("POST", "/confirmUser");

@@ -1,0 +1,14 @@
+<% locals.Users.forEach(function(User) { %>
+
+<p style="margin-right: 10px;"><span>نام و نام خانوادگی:</span><span><%- User.BachName %><%- " " %> <%- User.BachLname %></span></p>
+
+<p style="margin-right: 10px;"><span>شماره دانشجویی:</span><span><%- User.BachId %></span></p>
+
+<hr>
+
+<% }); %>
+
+
+<% if(locals.Users.length == 0) { %>
+<p style="text-align: center;"><span>هیچ رکوردی مشابه این مشخصات پیدا نشد!!!</span></p>
+<% } %>

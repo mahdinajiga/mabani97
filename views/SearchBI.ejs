@@ -1,0 +1,154 @@
+<html>
+    <head>
+        <title>mabani97</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- styles from https://www.w3schools.com/howto/howto_js_popup_form.asp-->
+        <style>
+            body {font-family: Arial, Helvetica, sans-serif;}
+            * {box-sizing: border-box;}
+
+            /* Add styles to the form container */
+            .form-container {
+                width: 50vw;
+                margin-right : 25vw;
+                padding: 10px;
+                background-color: white;
+            }
+            
+            /* Full-width input fields */
+            .form-container input[type=text], .form-container input[type=password] {
+                width: 100%;
+                padding: 15px;
+                margin: 5px 0 22px 0;
+                border: 0px solid grey;
+                border-radius: 5px;
+                background: #f1f1f1;
+            }
+            
+            /* When the inputs get focus, do something */
+            .form-container input[type=text]:focus, .form-container input[type=password]:focus {
+                background-color: #ddd;
+                outline: none;
+            }
+            
+            /* Set a style for the submit button */
+            .btn {
+                background-color: #e7e7e7;
+                color: black;
+                padding: 16px 20px;
+                border: 1px solid grey;
+                border-radius: 5px;
+                cursor: pointer;
+                width: 100%;
+                margin-bottom:10px;
+                opacity: 0.8;
+            }
+            
+            /* Add some hover effects to buttons */
+            .btn:hover{
+                opacity: 1;
+            }
+
+            #BachIdResult {
+                display: none;
+                left: 50%;
+                width: 50%;
+                padding: 10px;
+                margin-right: 25%;
+                margin-bottom: 2%;
+                border: 1px solid grey;
+                border-radius: 5px;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            }
+
+            /* loader effects for waitings*/
+            .loader {
+                border: 1vw solid #f3f3f3;
+                border-radius: 50%;
+                left: 50%;
+                top: 50%;
+                border-top: 1vw solid #3498db;
+                margin: 0 auto;
+                width: 9vw;
+                height: 9vw;
+                -webkit-animation: spin 2s linear infinite;
+                animation: spin 2s linear infinite;
+            }
+
+            @-webkit-keyframes spin {
+                0% { -webkit-transform: rotate(0deg); }
+                100% { -webkit-transform: rotate(360deg); }
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+    </head>
+    <body dir="rtl" onload="">
+        <p><h1 style="text-align: center;">جستجوی شماره دانشجویی بر اساس نام و نام خانوادگی</h1></p>
+
+        
+
+        <div id="searchForm" class="form-container">
+
+            <label for="BachName"><b>نام</b></label>
+            <input type="text" placeholder="" id="BachName" name="BachName" required>
+        
+            <label for="BachLname"><b>نام خانوادگی</b></label>
+            <input type="text" placeholder="" id="BachLname" name="BachLname" required>
+
+            <input type="button" style="margin-top: 10vh;" onclick="searchUserClicked()" id="searchBtn" value="جستجو" class="btn"/> 
+            
+            <div id="BachIdResult"></div> 
+        </div>
+
+
+        
+
+
+        <div id="loaderIco" style="display:none; position: fixed;" class="loader"></div>
+
+
+
+
+
+
+        <script>
+
+            function searchUserClicked()
+            {
+                var Load = document.getElementById("loaderIco"),
+                    Results = document.getElementById("BachIdResult");
+                Load.style.display = "block";
+                Results.innerHTML = "";
+                Results.style.display = "none";
+                var SBachName = document.getElementById("BachName").value,
+                    SBachLName= document.getElementById("BachLname").value;
+                if(SBachName != "" && SBachLName != "")
+                {
+                    var xp = new XMLHttpRequest();
+                    xp.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            Load.style.display = "none";
+                            Results.innerHTML = this.responseText;
+                            Results.style.display = "block";
+                        }
+                    };
+                    console.log({ name: SBachName , lname: SBachLName });
+                    xp.open("POST", "/searchUserByName");
+                    xp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                    xp.send("Data="+JSON.stringify({ name: SBachName , lname: SBachLName }));
+                }
+                else
+                {
+                    Load.style.display = "none";
+                    Results.style.display = "block";
+                    alert("لطفا اطلاعات را به طور کامل وارد کنید!!!");
+                }
+            }
+        </script>
+    </body>
+</html>

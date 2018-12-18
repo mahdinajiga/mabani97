@@ -24,3 +24,20 @@ university database:
         degree is an object consist of { DegreeName ("arshad", ...) , SalEtmam , Description }
 
 
+
+
+when unidatabase completes, the new bach info goes to another json file (named : 'NameBachSims.json')
+this file contains array of objects, each object is a bachelor name, lastname and BachId
+this database is being used when a user forgets the BachId.the program should search for any matched name and last name.
+
+NameBachSims:
+{
+    BachCount       :       bachelors count confirmed
+    BacheInfo       :   [
+        {
+            BachId
+            BachName
+            BachLname
+        }
+    ]
+}
