@@ -83,9 +83,57 @@
             </form>    
         </div>
         <hr>
+        <div class="form-container">
+            <h1>ایجاد مدرک جدید</h1>
+            <label for="NewBranchName"><b>نام رشته</b></label>
+            <input type="text" placeholder="" id="NewBranchName" name="NewBranchName" required>
+            
+            <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px; padding: 10px;">
+                <label for="NewBranchRanks"><h2>مقاطع</h2></label>
+                <div style="margin-top: 5vh;" id="NewBranchRanks" name="NewBranchRanks">
+
+                <div>
+                    <label for="NewBranchRankName0"><h4>نام مقطع</h4></label>
+                    <input type="text" placeholder="" id="NewBranchRankName0" name="NewBranchRankName0" required>
+
+                    <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px; padding: 10px;">
+                        <label for="NewBranchOri0"><h2>گرایش ها</h2></label>
+                        <div style="margin-top: 5vh;" id="NewBranchOri0" name="NewBranchOri0">
+                            
+                            <label for="NewBranchOriName00"><h4>نام گرایش</h4></label>
+                            <input type="text" placeholder="" id="NewBranchOriName00" name="NewBranchOriName00" required>
+
+                        </div>
+                        <input type="button" style="width: 30%; height: 8%; margin: 10px 35% 10px 35%;" onclick="newOri('0')" id="newOriBtn" value="اضافه کردن گرایش جدید" class="btn"/>   
+                    </div>
+                </div>
+
+                </div>
+                <input type="button" style="width: 50%; margin: 10px 25% 10px 25%;" onclick="newRank()" id="newRankBtn" value="اضافه کردن مقطع جدید" class="btn"/>   
+            </div>
+
+            <input type="button" style="margin-top: 15vh;" onclick="submitBranchClicked()" id="submitBranchBtn" value="ایجاد مدرک جدید" class="btn"/>
+
+        </div>
+        <hr>
+
+
+        <div class="form-container">
+            <h1>حذف مدارک قبلی</h1>
+            <label for="DegreeBranchEdit"><b>نام رشته</b></label>
+            <select style="margin-left: 20px;" id="DegreeBranchEdit" onchange="DegreeBranchEditEvent()">
+            <% locals.Branches.forEach(function(Branch) { %>
+                <option value="<%- Branch['index'] %>"><%- Branch['BranchName'] %></option>
+            <% }); %>
+            </select>
+            <input type="button" style="margin-top: 15vh;" onclick="submitDelBranchClicked()" id="submitDelBranchBtn" value="حذف مدرک" class="btn"/>
+
+        </div>
         
         <script>
-            var DegreeCount = 0;
+            var RawBranchs = '<%- BranchStr %>';
+            var Branchs = JSON.parse(RawBranchs);
+            var DegreeCount = 0, RanksCount = 1, OriCount = [1,0];
 
             function submitUserClicked() {
                 document.getElementById("submitBtn").onclick="";
@@ -101,15 +149,17 @@
                 if(TBachLname == "") { TBachLname = "نام خانوادگی وارد نشده"; }
                 for(var i=0; i < DegreeCount && DataComp==1; i++)
                 {
-                    if(document.getElementById("degreeName"+i).value == "" || document.getElementById("SalEtmam"+i).value == "")
+                    if(document.getElementById("SalEtmam"+i).value == null || Number(document.getElementById("SalEtmam"+i).value)==0)
                     {
                         DataComp=0
                     }
                     else
                     {
                         Degs.push({
-                            DegreeName : document.getElementById("degreeName"+i).value,
-                            SalEtmam : document.getElementById("SalEtmam"+i).value,
+                            Branch : Number(document.getElementById("DegreeBranch"+i).value),
+                            Rank : Number(document.getElementById("DegreeRank"+i).value),
+                            Ori : Number(document.getElementById("DegreeOri"+i).value),
+                            SalEtmam : Number(document.getElementById("SalEtmam"+i).value),
                             Description : document.getElementById("DegDescription"+i).value
                         });
                     }
@@ -146,12 +196,82 @@
 
             }
 
+            function DegreeBranchEvent()
+            {
+                var BranchNum = Number(document.getElementById("DegreeBranch" + arguments[0]).value);
+                if (BranchNum != -1)
+                {
+                    var RankSelect = document.getElementById("DegreeRank" + arguments[0]), i=0;
+                    var length = RankSelect.options.length;
+                    for (i = 0; i < length; i++) {
+                        RankSelect.options[i] = null;
+                    }
+                    for(i=0; i<Branchs[BranchNum].Ranks.length; i++)
+                    {
+                        var option = document.createElement("option");
+                        option.text = Branchs[BranchNum].Ranks[i].RankName;
+                        option.value = Branchs[BranchNum].Ranks[i].index;
+                        if(i>=length)
+                        {
+                            RankSelect.add(option);
+                        }
+                        else
+                        {
+                            RankSelect.options[i] = option;
+                        }
+                        RankSelect.value = Branchs[BranchNum].Ranks[i].index;
+                    }
+                    for (; i < length; i++) {
+                        RankSelect.options[i] = null;
+                    }
+                    DegreeOriEvent(arguments[0]);
+                }
+            }
+
+            function DegreeOriEvent()
+            {
+                var BranchNum = Number(document.getElementById("DegreeBranch" + arguments[0]).value);
+                if (BranchNum != -1)
+                {
+                    var RankNum = Number(document.getElementById("DegreeRank" + arguments[0]).value);
+                    if (RankNum != -1)
+                    {
+                        var OriSelect = document.getElementById("DegreeOri" + arguments[0]), i=0;
+                        var length = OriSelect.options.length;
+                        for (i = 0; i < length; i++) {
+                            OriSelect.options[i] = null;
+                        }
+                        for(i=0; i<Branchs[BranchNum].Ranks[RankNum].Orientations.length; i++)
+                        {
+                            var option = document.createElement("option");
+                            option.text = Branchs[BranchNum].Ranks[RankNum].Orientations[i].OriName;
+                            option.value = Branchs[BranchNum].Ranks[RankNum].Orientations[i].index;
+                            if(i>=length)
+                            {
+                                OriSelect.add(option);
+                            }
+                            else
+                            {
+                                OriSelect.options[i] = option;
+                            }
+                        }
+                        for (; i < length; i++) {
+                            OriSelect.options[i] = null;
+                        }
+                    }
+                }
+            }
+
             function newDegree() {
                 var xp = new XMLHttpRequest();
                 xp.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
-                        var temp = document.getElementById("degreesForm").innerHTML;
-                        document.getElementById("degreesForm").innerHTML = temp + this.responseText;
+                        var div = document.createElement('div');
+                        div.innerHTML = this.responseText;
+                        document.getElementById("degreesForm").appendChild(div);/*
+                        document.getElementById("DegreeBranch" + DegreeCount).onchange = "DegreeBranchEvent(" + DegreeCount + ");";
+                        document.getElementById("DegreeOri" + DegreeCount).onchange = "DegreeOriEvent(" + DegreeCount + ");";*/
+                        DegreeBranchEvent(DegreeCount);
                         DegreeCount++;
                     }
                 };
@@ -160,49 +280,82 @@
                 xp.send("Data="+JSON.stringify({ id: DegreeCount }));
             }
 
-            function searchConfirmedUserById()
-            {
-                document.getElementById("loaderIco").style.display = "block";
-                document.getElementById("BachIdResult").style.display = "none";
-                var SBachId = document.getElementById("SearchBachId").value;
-                if(SBachId != "")
-                {
-                    var xp = new XMLHttpRequest();
-                    xp.onreadystatechange = function () {
-                        if (this.readyState == 4 && this.status == 200) {
-                            document.getElementById("loaderIco").style.display = "none";
-                            document.getElementById("BachIdResult").innerHTML = this.responseText;
-                            document.getElementById("BachIdResult").style.display = "block";
-                        }
-                    };
-                    xp.open("POST", "/searchUserById");
-                    xp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                    xp.send("Data="+JSON.stringify({ id: SBachId }));
-                }
-                else
-                {
-                    document.getElementById("loaderIco").style.display = "none";
-                    document.getElementById("BachIdResult").style.display = "block";
-                    alert("لطفا اطلاعات را به طور کامل وارد کنید!!!");
-                }
+            function newRank() {
+                var div = document.createElement('div');
+                div.innerHTML = `<label for="NewBranchRankName` + RanksCount + `"><h4>نام مقطع</h4></label>
+                    <input type="text" placeholder="" id="NewBranchRankName` + RanksCount + `" name="NewBranchRankName` + RanksCount + `" required>
+
+                    <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px; padding: 10px;">
+                        <label for="NewBranchOri` + RanksCount + `"><h2>گرایش ها</h2></label>
+                        <div style="margin-top: 5vh;" id="NewBranchOri` + RanksCount + `" name="NewBranchOri` + RanksCount + `">
+                            
+                            <label for="NewBranchOriName` + RanksCount + `0"><h4>نام گرایش</h4></label>
+                            <input type="text" placeholder="" id="NewBranchOriName` + RanksCount + `0" name="NewBranchOriName` + RanksCount + `0" required>
+
+                        </div>
+                        <input type="button" style="width: 30%; height: 8%; margin: 10px 35% 10px 35%;" onclick="newOri('` + RanksCount + `')" id="newOriBtn" value="اضافه کردن گرایش جدید" class="btn"/>   
+                    </div>`;
+                document.getElementById("NewBranchRanks").appendChild(div);
+                OriCount[RanksCount] = 1;
+                RanksCount++;
+                OriCount[RanksCount] = 0;
             }
 
-            function searchConfirmedUserByBio()
+            function newOri() {
+                var div = document.createElement('div');
+                div.innerHTML = `
+                <label for="NewBranchOriName` + arguments[0] + OriCount[arguments[0]] + `"><h4>نام گرایش</h4></label>
+                <input type="text" placeholder="" id="NewBranchOriName` + arguments[0] + OriCount[arguments[0]] + `" name="NewBranchOriName` + arguments[0] + OriCount[arguments[0]] + `" required>`;
+                document.getElementById("NewBranchOri" + arguments[0]).appendChild(div);
+                OriCount[arguments[0]]++;
+            }
+
+            function submitBranchClicked()
             {
-                document.getElementById("loaderIco").style.display = "block";
-                document.getElementById("BioResult").style.display = "none";
-                var WBio = document.getElementById("SearchBio").value;
+                var Data = {"RanksCount" : RanksCount, "OriCount" : OriCount};
+                var Ranks=[];
+                for(var i=0; i<RanksCount; i++)
+                {
+                    var Ories=[];
+                    for(var j=0; j<OriCount[i]; j++)
+                    {
+                        Ories.push({index:j, OriName: document.getElementById("NewBranchOriName" + i + j).value});
+                    }
+                    Ranks.push({index : i});
+                    Ranks[i]['RankName'] = document.getElementById("NewBranchRankName" + i).value;
+                    Ranks[i]['Orientations'] = Ories;
+                }
+                Data['Ranks'] = Ranks;
+                Data['BranchName'] = document.getElementById("NewBranchName").value;
                 var xp = new XMLHttpRequest();
                 xp.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
-                        document.getElementById("loaderIco").style.display = "none";
-                        document.getElementById("BioResult").innerHTML = this.responseText;
-                        document.getElementById("BioResult").style.display = "block";
+                        alert(this.responseText);
                     }
                 };
-                xp.open("POST", "/searchUserByBio");
+                xp.open("POST", "/SetNewBranch");
                 xp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                xp.send("Data="+JSON.stringify({ word: WBio , DegreeName: document.getElementById("SearchDegreeName").value , SalEtmam: document.getElementById("SearchSalEtmam").value }));
+                xp.send("Data="+JSON.stringify(Data));
+            }
+
+            function DegreeBranchEditEvent()
+            {
+
+            }
+
+            function submitDelBranchClicked()
+            {
+                if (confirm('آیا مطمئنید که میخواهید این مدرک را حذف کنید؟؟؟')) {
+                    var xp = new XMLHttpRequest();
+                    xp.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            alert(this.responseText);
+                        }
+                    };
+                    xp.open("POST", "/removeBranch");
+                    xp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                    xp.send("Data="+JSON.stringify({id:Number(document.getElementById("DegreeBranchEdit").value)}));
+                }
             }
         </script>
     </body>

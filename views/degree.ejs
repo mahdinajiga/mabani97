@@ -1,9 +1,22 @@
 <div>
-    <select id="degreeName<%- locals.id %>">
-    <% locals.options.forEach(function(option) { %>
-        <option value="<%- option %>"><%- option %></option>
-    <% }); %>
-    </select>
+    <p>
+        <span style="margin-right: 10px;"> مدرک </span>
+        <select style="margin-left: 20px;" id="DegreeBranch<%- locals.id %>" onchange="DegreeBranchEvent(<%- locals.id %>)">
+        <% locals.Branches.forEach(function(Branch) { %>
+            <option value="<%- Branch['index'] %>"><%- Branch['BranchName'] %></option>
+        <% }); %>
+        </select>
+
+        <span style="margin-right: 10px;"> مقطع </span>
+        <select style="margin-left: 20px;" id="DegreeRank<%- locals.id %>" onchange="DegreeOriEvent(<%- locals.id %>)">
+            <option value="-2">---------</option>
+        </select>
+        <br><br>
+        <span style="margin-right: 10px;"> گرایش </span>
+        <select style="margin-left: 20px;" id="DegreeOri<%- locals.id %>">
+            <option value="-2">---------</option>
+        </select>
+    </p>
     
     <input type="text" placeholder="سال اتمام دوره" id="SalEtmam<%- locals.id %>" required>
 

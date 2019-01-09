@@ -7,7 +7,15 @@
 <p style="margin-right: 10px;"><span>ایمیل:</span><span><%- User.email %></span></p>
 
 <% User.Degs.forEach(function(Deg) { %>
-    <p style="margin-right: 30px;"><span>مقطع <%- Deg.DegreeName %></span><span> سال <%- Deg.SalEtmam %> <%- Deg.Description %></span></p>
+    <p style="margin-right: 30px;">
+    <span style="margin-right: 5px;">مدرک <%- Deg.DegreeRank %></span>
+    <span style="margin-right: 5px;">رشته <%- Deg.DegreeBranch %></span>
+    <span style="margin-right: 5px;">گرایش <%- Deg.RankOri %></span>
+    <span style="margin-right: 5px;">سال <%- Deg.SalEtmam %></span>
+    </p>
+    <p style="margin-right: 30px;">
+    <span style="margin-right: 5px;"><%- Deg.Description %></span>
+    </p>
 <% }); %>
 
 <p style="margin-right: 10px;"><span>بیوگرافی:</span><br><span><%- User.Bio %></span></p>

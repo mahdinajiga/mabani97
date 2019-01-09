@@ -1,6 +1,7 @@
 const fs = require('fs');
 var stringSimilarity = require('string-similarity');
 var NodesDir; // database root address
+var Branches = [];
 
 
 var init = function () {
@@ -10,9 +11,35 @@ var init = function () {
         fs.mkdirSync(NodesDir+"/submiteds");
         fs.mkdirSync(NodesDir+"/uniDatabase");
         fs.writeFileSync(NodesDir + "/NameBachSims.json", JSON.stringify({BachCount : 0, BacheInfo:[]}));
+        
+        Branches.push({
+            index:0,
+            BranchName: "نام مدرک پیش فرض",
+            Ranks: [{
+                index : 0,
+                RankName : "مقطع مدرک پیش فرض",
+                Orientations : [{
+                    index : 0,
+                    OriName : "گرایش مدرک پیش فرض"
+                }]
+            }]
+        });
+        SyncBranches();
+    }
+    else
+    {
+        Branches = JSON.parse(fs.readFileSync(NodesDir + "/Branches.json")).BranchArr;
     }
     console.log("Database management service initialized...")
 }
+
+
+function SyncBranches() 
+{
+    fs.writeFileSync(NodesDir + "/Branches.json", JSON.stringify({ BranchesCount: Branches.length, BranchArr: Branches}));
+}
+
+
 
 
 
@@ -196,12 +223,27 @@ var confirmUser = function () {
         Bach        :   Object          :   اطلاعات دانشجو
 */
 var GetUserInfo = function () {
-    return JSON.parse(fs.readFileSync(NodesDir + "/submiteds/" + arguments[0]));
+    var UserInf = JSON.parse(fs.readFileSync(NodesDir + "/submiteds/" + arguments[0]));
+    var DegsCountN = Number(UserInf.DegsCount);
+    for(var i=0; i< DegsCountN; i++)
+    {
+        UserInf.Degs[i] = DegreeParse(UserInf.Degs[i]);
+    }
+    return UserInf;
 }
 
 
 
-
+function DegreeParse(Deg) 
+{
+    var CurrentBranch = Branches[Number(Deg['Branch'])]; // DegreeBranch in Degs
+    Deg['DegreeBranch'] = CurrentBranch.BranchName;
+    var CurrentRank = CurrentBranch.Ranks[Number(Deg['Rank'])]; // DegreeRankIndex in Degs
+    Deg['DegreeRank'] = CurrentRank.RankName;
+    var CurrentOri = CurrentRank.Orientations[Number(Deg['Ori'])]; // RankOriIndex in Degs
+    Deg['RankOri'] = CurrentOri.OriName;
+    return Deg;
+}
 
 
 
@@ -246,15 +288,19 @@ var GetconfirmedUserInfo = function () {
 
     inputs:
         QueryObj    :   arguments[0]    :   شامل متن جستجو و نوع مدرک و سال فارغ التحصیلی
-            QueryObj.word       :   متن جستجو
-            QueryObj.DegreeName :   نام مدرک
-            QueryObj.SalEtmam   :   سال اخذ مدرک
+            QueryObj.word           :   متن جستجو
+            QueryObj.Branch         :   -1 for empty query
+            QueryObj.Rank           :   -1 for empty query
+            QueryObj.Ori            :   -1 for empty query
+            QueryObj.SalEtmamFirst  :   First SalEtmam of query
+            QueryObj.SalEtmamLast   :   Last SalEtmam of query
 
     outputs:
         ReturnObj   :   Array of Bach   :   آرایه ای از اطلاعات دانشجویان حاصل جستجو
 */
 var SearchUserByBioWord = function () {
     var QueryObj = arguments[0];
+    console.log(QueryObj);
     var ReturnObj = [];
     var files = fs.readdirSync(NodesDir+"/submiteds/");
     for(var i=0; i<files.length; i++)
@@ -264,8 +310,13 @@ var SearchUserByBioWord = function () {
         var UserDeg = BachData.Degs;
         if(QueryObj.word == "") // search with degree only
         {
-            if(QueryObj.DegreeName == "0")
+            if(QueryObj.Branch == -1)
             {
+                var DegsCountN = Number(BachData.DegsCount);
+                for(var i=0; i< DegsCountN; i++)
+                {
+                    BachData.Degs[i] = DegreeParse(BachData.Degs[i]);
+                }
                 ReturnObj.push(BachData); // show allllllll records, there is no search patern
             }
             else
@@ -273,21 +324,39 @@ var SearchUserByBioWord = function () {
                 var UserFound = 0;
                 for(var j=0; j<UserDeg.length && UserFound==0; j++)
                 {
-                    if(UserDeg[j].DegreeName == QueryObj.DegreeName && UserDeg[j].SalEtmam == QueryObj.SalEtmam)
+                    if(UserDeg[j].Branch == QueryObj.Branch)
                     {
-                        UserFound = 1;
+                        if(UserDeg[j].Rank == QueryObj.Rank
+                            && UserDeg[j].SalEtmam <= Number(QueryObj.SalEtmamLast)
+                            && UserDeg[j].SalEtmam >= Number(QueryObj.SalEtmamFirst) )
+                        {
+                            if(QueryObj.Ori == -1 || UserDeg[j].Ori == QueryObj.Ori)
+                            {
+                                UserFound = 1;
+                            }
+                        }
                     }
                 }
                 if(UserFound==1)
                 {
+                    var DegsCountN = Number(BachData.DegsCount);
+                    for(var i=0; i< DegsCountN; i++)
+                    {
+                        BachData.Degs[i] = DegreeParse(BachData.Degs[i]);
+                    }
                     ReturnObj.push(BachData);
                 }
             }
         }
-        else if(QueryObj.DegreeName == "0") // search with bio only
+        else if(QueryObj.Branch == -1) // search with bio only
         {
             if(UserBio.includes(QueryObj.word))
             {
+                var DegsCountN = Number(BachData.DegsCount);
+                for(var i=0; i< DegsCountN; i++)
+                {
+                    BachData.Degs[i] = DegreeParse(BachData.Degs[i]);
+                }
                 ReturnObj.push(BachData);
             }
         }
@@ -298,13 +367,26 @@ var SearchUserByBioWord = function () {
                 var UserFound = 0;
                 for(var j=0; j<UserDeg.length && UserFound==0; j++)
                 {
-                    if(UserDeg[j].DegreeName == QueryObj.DegreeName && UserDeg[j].SalEtmam == QueryObj.SalEtmam)
+                    if(UserDeg[j].Branch == QueryObj.Branch)
                     {
-                        UserFound = 1;
+                        if(UserDeg[j].Rank == QueryObj.Rank
+                            && UserDeg[j].SalEtmam <= Number(QueryObj.SalEtmamLast)
+                            && UserDeg[j].SalEtmam >= Number(QueryObj.SalEtmamFirst) )
+                        {
+                            if(QueryObj.Ori == -1 || UserDeg[j].Ori == QueryObj.Ori)
+                            {
+                                UserFound = 1;
+                            }
+                        }
                     }
                 }
                 if(UserFound==1)
                 {
+                    var DegsCountN = Number(BachData.DegsCount);
+                    for(var i=0; i< DegsCountN; i++)
+                    {
+                        BachData.Degs[i] = DegreeParse(BachData.Degs[i]);
+                    }
                     ReturnObj.push(BachData);
                 }
             }
@@ -366,16 +448,90 @@ var SearchUserByName = function () {
 
 
 
+/*
+    ارسال مدرک های ثبت شده
+*/
+var GetBranches = function () 
+{
+    return Branches;
+}
 
 
 
-module.exports.init = init;
-module.exports.submitedUserExists = submitedUserExists;
-module.exports.submitedUserConfirmed = submitedUserConfirmed;
-module.exports.submitUser = submitUser;
-module.exports.confirmedUserExists = confirmedUserExists;
-module.exports.confirmUser = confirmUser;
-module.exports.GetUserInfo = GetUserInfo;
-module.exports.GetconfirmedUserInfo = GetconfirmedUserInfo;
-module.exports.SearchUserByBioWord = SearchUserByBioWord;
-module.exports.SearchUserByName = SearchUserByName;
+
+
+/*
+    ثبت مدرک جدید
+
+    arguments[0]    :   مدرک جدید
+*/
+var SaveNewBranch = function () 
+{
+    var newBranch = arguments[0];
+    // for checking new branch
+    newBranch.index=Branches.length;
+    Branches.push(newBranch);
+    SyncBranches();
+}
+
+
+
+
+
+
+
+/*
+    تغییر مدارک قبلی
+
+    arguments[0]    :   index of branch
+    arguments[1]    :   branch
+*/
+var EditBranch = function () 
+{
+    if(arguments[0]<Branches.length)
+    {
+        var BranchData = arguments[1];
+        // for checking new branch Data
+        Branches[arguments[0]] = BranchData;
+        SyncBranches();
+    }
+}
+
+
+
+
+/*
+    حذف مدارک قبلی
+
+    arguments[0]    :   index of branch
+*/
+var DeleteBranch = function () 
+{
+    if(arguments[0]<Branches.length && arguments[0]>-1)
+    {
+        Branches.splice(arguments[0],1);
+        SyncBranches();
+    }
+}
+
+
+
+
+
+
+
+
+module.exports.init = init; // اجرای اولیه دیتابیس
+module.exports.submitedUserExists = submitedUserExists; // بررسی دیتابیس کنونی
+module.exports.submitedUserConfirmed = submitedUserConfirmed; // بررسی مورد تائید بودن اطلاعات ورودی دانشجو
+module.exports.submitUser = submitUser; // تائید کاربر و ذخیره اطلاعات در دیتابیس کنونی
+module.exports.confirmedUserExists = confirmedUserExists;   // بررسی دیتابیس دانشگاه
+module.exports.confirmUser = confirmUser;   // ثبت اطلاعات دانشجو در دیتابیس دانشگاه
+module.exports.GetUserInfo = GetUserInfo;   // به دست اوردن اطلاعات دانشجو از دیتابیس کنونی بر اساس شماره دانشجویی
+module.exports.GetconfirmedUserInfo = GetconfirmedUserInfo; // به دست اوردن اطلاعات دانشجو از دیتابیس دانشگاه بر اساس شماره دانشجویی
+module.exports.SearchUserByBioWord = SearchUserByBioWord;   // جستجوی دانشجو بر اساس قسمتی از متن بیو و یا مدرک تحصیلی
+module.exports.SearchUserByName = SearchUserByName; // جستجوی دانشجو بر اساس تام و نام خانوادگی
+module.exports.GetBranches = GetBranches;   // ارسال مدرک های ثبت شده
+module.exports.SaveNewBranch = SaveNewBranch;   // ثبت مدرک جدید
+module.exports.EditBranch = EditBranch;   // تغییر مدارک قبلی
+module.exports.DeleteBranch = DeleteBranch;   // حذف مدارک قبلی

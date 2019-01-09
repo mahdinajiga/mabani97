@@ -168,15 +168,34 @@
             <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px;">
                 <input type="text" placeholder="جسنجو در بیو" id="SearchBio" style="width: 70%; margin-right: 15px;">
                 <input type="button" onclick="searchConfirmedUserByBio()" id="submitBtn" value="جستجو بر اساس اطلاعات" class="btn pull-left" style="width: 25%; left = 0px;"/>
-                <p>رشته
-                <select style="margin-left: 20px;" id="SearchDegreeName">
-                    <option value="0">مهم نیست</option>
-                <% locals.options.forEach(function(option) { %>
-                    <option value="<%- option %>"><%- option %></option>
+                <p>
+
+                <span style="margin-right: 10px;"> مدرک </span>
+                <select style="margin-left: 20px;" id="SearchDegreeBranch" onchange="SearchDegreeBranchChanged();">
+                    <option value="-1">مهم نیست</option>
+                <% locals.Branches.forEach(function(Branch) { %>
+                    <option value="<%- Branch['index'] %>"><%- Branch['BranchName'] %></option>
                 <% }); %>
                 </select>
-                سال فارغ التحصیلی 
-                <input type="text" placeholder="97" id="SearchSalEtmam" style="width: 100px; text-align: center;">
+
+                <span style="margin-right: 10px;"> مقطع </span>
+                <select style="margin-left: 20px;" id="SearchDegreeRank" onchange="SearchDegreeRankChanged();">
+                    <option value="-1">---------</option>
+                </select>
+
+                <span style="margin-right: 10px;"> گرایش </span>
+                <select style="margin-left: 20px;" id="SearchDegreeOri">
+                    <option value="-1">مهم نیست</option>
+                </select>
+                </p>
+                <p>
+                <span style="margin-right: 10px;"> سال فارغ التحصیلی از  </span>
+                
+                <input type="text" placeholder="20" id="SearchSalEtmamFirst" style="width: 75px; height: 25px; text-align: center;">
+                
+                <span style="margin-right: 10px; margin-left: 10px;"> تا  </span>
+
+                <input type="text" placeholder="98" id="SearchSalEtmamLast" style="width: 75px; height: 25px; text-align: center;">
                 </p>
                 <div id="BioResult" style="display: none; left: 50%; width: 50%; margin-right: 25%; margin-bottom: 2%; border: 1px solid grey; border-radius: 5px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
                 
@@ -186,12 +205,78 @@
 
             <div id="loaderIco" style="display:none; position: fixed;" class="loader"></div>
         <script>
-            function openForm() {
-                document.getElementById("submitForm").style.display = "block";
+            var RawBranchs = '<%- BranchStr %>';
+            var Branchs = JSON.parse(RawBranchs);
+
+            function SearchDegreeBranchChanged()
+            {
+                var BranchNum = Number(document.getElementById("SearchDegreeBranch").value);
+                if (BranchNum != -1)
+                {
+                    var RankSelect = document.getElementById("SearchDegreeRank"), i=0;
+
+                    var length = RankSelect.options.length;
+                    for (i = 0; i < length; i++) {
+                        RankSelect.options[i] = null;
+                    }
+                    for(i=0; i<Branchs[BranchNum].Ranks.length; i++)
+                    {
+                        var option = document.createElement("option");
+                        option.text = Branchs[BranchNum].Ranks[i].RankName;
+                        option.value = Branchs[BranchNum].Ranks[i].index;
+                        if(i>=length)
+                        {
+                            RankSelect.add(option);
+                        }
+                        else
+                        {
+                            RankSelect.options[i] = option;
+                        }
+                    }
+                    for (; i < length; i++) {
+                        RankSelect.options[i] = null;
+                    }
+                    SearchDegreeRankChanged();
+                }
             }
-            
-            function closeForm() {
-                document.getElementById("submitForm").style.display = "none";
+
+            function SearchDegreeRankChanged()
+            {
+                var BranchNum = Number(document.getElementById("SearchDegreeBranch").value);
+                if (BranchNum != -1)
+                {
+                    var RankNum = Number(document.getElementById("SearchDegreeRank").value);
+                    if (RankNum != -1)
+                    {
+                        var OriSelect = document.getElementById("SearchDegreeOri"), i=0;
+
+                        var length = OriSelect.options.length;
+                        for (i = 0; i < length; i++) {
+                            OriSelect.options[i] = null;
+                        }
+                        var option = document.createElement("option");
+                        option.text = "مهم نیست";
+                        option.value = "-1";
+                        OriSelect.add(option);
+                        for(i=0; i<Branchs[BranchNum].Ranks[RankNum].Orientations.length; i++)
+                        {
+                            var option = document.createElement("option");
+                            option.text = Branchs[BranchNum].Ranks[RankNum].Orientations[i].OriName;
+                            option.value = Branchs[BranchNum].Ranks[RankNum].Orientations[i].index;
+                            if(i>=length)
+                            {
+                                OriSelect.add(option);
+                            }
+                            else
+                            {
+                                OriSelect.options[i] = option;
+                            }
+                        }
+                        for (; i < length; i++) {
+                            OriSelect.options[i] = null;
+                        }
+                    }
+                }
             }
 
             function submitUserClicked() {
@@ -237,13 +322,30 @@
                     xp.onreadystatechange = function () {
                         if (this.readyState == 4 && this.status == 200) {
                             var Resp = JSON.parse(this.responseText);
-                            document.getElementById("submitBtn").value = Resp.message;
-                            alert(Resp.message);
+                            if(Resp.code==401)
+                            {
+                                if(confirm("اطلاعات شما قبلا ثبت شده، آیا میخواهید ادامه دهید؟؟؟"))
+                                {
+                                    submitUserClicked(1);
+                                }
+                            }
+                            else
+                            {
+                                document.getElementById("submitBtn").value = Resp.message;
+                                alert(Resp.message);
+                            }
                         }
                     };
                     xp.open("POST", "/submitUser");
                     xp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                    xp.send("Data="+JSON.stringify({ 
+                    var ov = 0;
+                    if(arguments[0])
+                    {
+                        ov=arguments[0];
+                    }
+                    xp.send("Data="+JSON.stringify({
+                        Override:ov,
+                        Bach:{ 
                         BachId : TBachId,
                         CodeMelli : TCodeMelli,
                         BachName : TBachName,
@@ -252,7 +354,7 @@
                         TelNum : TTelNum,
                         Bio : TBio/*,
                         Degrees : Degs,
-                        DegreesCount : DegreeCount*/
+                        DegreesCount : DegreeCount*/}
                      }));
                 }
                 else
@@ -261,20 +363,6 @@
                     alert("لطفا اطلاعات را به طور کامل وارد کنید!!!");
                 }
 
-            }
-
-            function newDegree() {
-                var xp = new XMLHttpRequest();
-                xp.onreadystatechange = function () {
-                    if (this.readyState == 4 && this.status == 200) {
-                        var temp = document.getElementById("degreesForm").innerHTML;
-                        document.getElementById("degreesForm").innerHTML = temp + this.responseText;
-                        DegreeCount++;
-                    }
-                };
-                xp.open("POST", "/degree");
-                xp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                xp.send("Data="+JSON.stringify({ id: DegreeCount }));
             }
 
             function searchConfirmedUserById()
@@ -319,7 +407,16 @@
                 };
                 xp.open("POST", "/searchUserByBio");
                 xp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                xp.send("Data="+JSON.stringify({ word: WBio , DegreeName: document.getElementById("SearchDegreeName").value , SalEtmam: document.getElementById("SearchSalEtmam").value }));
+                
+                var Brnch = Number(document.getElementById("SearchDegreeBranch").value),
+                    Rnk = Number(document.getElementById("SearchDegreeRank").value),
+                    Orie = Number(document.getElementById("SearchDegreeOri").value);
+                var SEFirst = Number(document.getElementById("SearchSalEtmamFirst").value),
+                    SELast = Number(document.getElementById("SearchSalEtmamLast").value);
+                xp.send("Data="+JSON.stringify({
+                     word: WBio , Branch: Brnch , Rank: Rnk , Ori: Orie,
+                     SalEtmamFirst: SEFirst, SalEtmamLast: SELast
+                     }));
             }
         </script>
     </body>

@@ -62,3 +62,6 @@ typings/
 
 # Nodes directory
 Nodes/
+
+# common files directory
+ComFiles/

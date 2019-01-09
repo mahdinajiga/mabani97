@@ -20,8 +20,43 @@ university database:
     Nam (string)                : BachName
     NamKhanevadegi (string)     : BachLname
 }
-    *:  ["karshenasi", "arshad", "doktora", "fog-doktora", ...]
-        degree is an object consist of { DegreeName ("arshad", ...) , SalEtmam , Description }
+    *:  Degree is array of Degs
+
+
+Branches database:
+{
+    index (number)              : increament index of current branch
+    BranchName  (string)        : name of this branch
+    Ranks (array of objects)    : [{
+        index (number)          : index of current Rank
+        RankName (string)       : name of this Rank
+        Orientations (ObjArr)   : [{
+            index (number)      : index of current Orientation
+            OriName (string)    : name of current Orientation
+        }]
+    }]
+}
+
+
+
+
+
+
+
+
+objects:
+
+Degs: [
+{
+    Branch (number)             : index of degree branch on Branches database
+    Rank (number)               : index of Rank for this degree
+    Ori (number)                : index of Orientation in Rank
+    SalEtmam (number)           : year graduation
+    Description (string)        : a Description about this degree, usually nothing
+}
+]
+
+
 
 
 

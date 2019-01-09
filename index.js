@@ -14,7 +14,7 @@ DatabaseMS.init('./Nodes'); // calling init() on DBMS
 
 var OptionValues = ["کارشناسی", "کارشناسی ارشد", "دکترا", "فوق دکترا"]; // DegreeTypes
 
-
+var FirstDegreeDate = 20, LastDegreeDate = 98;
 
 
 
@@ -40,7 +40,7 @@ app.get('/font/Roya.woff', function (req, res) {
 app.get('/', function (req, res) {
     if(req.query.reqid) //look if there is reqid, if there is no reqid, redirect user
     {
-        res.render('index', { options : OptionValues });
+        res.render('index', { options : OptionValues , Branches : DatabaseMS.GetBranches() , BranchStr : JSON.stringify(DatabaseMS.GetBranches()) });
     }
     else
     {
@@ -84,7 +84,7 @@ app.get('/searchByName', function (req, res) {
 app.get('/uni', function (req, res) {
     if(req.query.reqid)
     {
-        res.render('uni', { options : OptionValues });
+        res.render('uni', { options : OptionValues , Branches : DatabaseMS.GetBranches() , BranchStr : JSON.stringify(DatabaseMS.GetBranches()) });
     }
     else
     {
@@ -109,7 +109,7 @@ app.get('/uni', function (req, res) {
 */
 app.post('/degree', function (req, res) {
     var IncomingData = JSON.parse(req.body.Data); // parsing incoming data in JSON
-    res.render('degree', { id: IncomingData.id, options : OptionValues });
+    res.render('degree', { id: IncomingData.id, options : OptionValues , Branches : DatabaseMS.GetBranches() , BranchStr : JSON.stringify(DatabaseMS.GetBranches()) });
 });
 
 
@@ -127,6 +127,8 @@ app.post('/degree', function (req, res) {
 */
 app.post('/submitUser', function (req, res) {
     var IncomingData = JSON.parse(req.body.Data); // parsing incoming data in JSON
+    var overide = IncomingData.Override;
+    IncomingData = IncomingData.Bach;
     var DataComp = 1; // data complete flag
     var TBachId = IncomingData.BachId,
         TCodeMelli = IncomingData.CodeMelli,
@@ -152,7 +154,27 @@ app.post('/submitUser', function (req, res) {
     {
         if(DatabaseMS.submitedUserExists(TBachId) == 1)
         {
-            res.send(JSON.stringify({ message: "اطلاعات شما قبلا ثبت شده !!!" }));
+            if(overide==1)
+            {
+                var UniBachData = DatabaseMS.GetconfirmedUserInfo(TBachId);
+                var Bach = {
+                    BachId: TBachId,
+                    CodeMelli: TCodeMelli,
+                    BachName: TBachName,
+                    BachLname: TBachLname,
+                    email: Temail,
+                    TelNum: TTelNum,
+                    Bio: TBio,
+                    Degs: UniBachData.Degs,
+                    DegsCount: UniBachData.DegsCount
+                };
+                DatabaseMS.submitUser(TBachId, Bach);
+                res.send(JSON.stringify({ code:200 , message: "اطلاعات شما با موفقیت ثبت شد..." }));
+            }
+            else
+            {
+                res.send(JSON.stringify({ code:401 , message: "اطلاعات شما قبلا ثبت شده !!!" }));
+            }
         }
         else
         {
@@ -171,11 +193,11 @@ app.post('/submitUser', function (req, res) {
                     DegsCount: UniBachData.DegsCount
                 };
                 DatabaseMS.submitUser(TBachId, Bach);
-                res.send(JSON.stringify({ message: "اطلاعات شما با موفقیت ثبت شد..." }));
+                res.send(JSON.stringify({ code:200 , message: "اطلاعات شما با موفقیت ثبت شد..." }));
             }
             else
             {
-                res.send(JSON.stringify({ message: "اطلاعات وارد شده صحیح نیست!!!" }));
+                res.send(JSON.stringify({ code:200 , message: "اطلاعات وارد شده صحیح نیست!!!" }));
             }
         }
     }
@@ -305,8 +327,103 @@ app.post('/searchUserByName', function (req, res) {
 */
 app.post('/searchUserByBio', function (req, res) {
     var IncomingData = JSON.parse(req.body.Data); // parsing incoming data in JSON
+    IncomingData.Branch = Number(IncomingData.Branch);
+    IncomingData.Rank = Number(IncomingData.Rank);
+    IncomingData.Ori = Number(IncomingData.Ori);
+    IncomingData.SalEtmamFirst = Number(IncomingData.SalEtmamFirst);
+    if(IncomingData.SalEtmamFirst==0)
+        IncomingData.SalEtmamFirst=FirstDegreeDate;
+    IncomingData.SalEtmamLast = Number(IncomingData.SalEtmamLast);
+    if(IncomingData.SalEtmamLast==0)
+        IncomingData.SalEtmamLast=LastDegreeDate;
     res.render('foundUserByBio',{ Users: DatabaseMS.SearchUserByBioWord(IncomingData)});
 });
+
+
+
+
+
+
+
+
+
+/*
+    POST /SetNewBranch
+
+    ایجاد مدرک جدید
+*/
+app.post('/SetNewBranch', function (req, res) {
+    var IncomingData = JSON.parse(req.body.Data); // parsing incoming data in JSON
+
+    var DataIncorrect = 0;
+    if(IncomingData.BranchName == null
+        || Number(IncomingData.RanksCount) == 0
+        || IncomingData.OriCount.length != Number(IncomingData.RanksCount)+1
+        || IncomingData.Ranks.length != Number(IncomingData.RanksCount))
+    {
+        DataIncorrect = 1;
+    }
+    for(var i=0; i<Number(IncomingData.RanksCount) && DataIncorrect==0; i++)
+    {
+        if(IncomingData.Ranks[i].index != i
+            || IncomingData.Ranks[i].RankName==null
+            || IncomingData.Ranks[i].Orientations==null)
+        {
+            DataIncorrect=1;
+        }
+        else
+        {
+            if(IncomingData.Ranks[i].Orientations.length != IncomingData.OriCount[i])
+            {
+                DataIncorrect=1;
+            }
+            else
+            {
+                for(var j=0; j<IncomingData.OriCount[i] && DataIncorrect==0; j++)
+                {
+                    if(IncomingData.Ranks[i].Orientations[j].index != j
+                        || IncomingData.Ranks[i].Orientations[j].OriName==null)
+                    {
+                        DataIncorrect=1;
+                    }
+                }
+            }
+        }
+    }
+    if(DataIncorrect==0)
+    {
+        DatabaseMS.SaveNewBranch(IncomingData);
+
+        res.send("مدرک با موفقیت ثبت شد");
+    }
+    else
+    {
+        res.send("لطفا اطلاعات را با دقت پر کنید");
+    }
+});
+
+
+
+
+
+
+
+/*
+    POST /removeBranch
+
+    حذف مدرک
+*/
+app.post('/removeBranch', function (req, res) {
+    var IncomingData = JSON.parse(req.body.Data); // parsing incoming data in JSON
+    DatabaseMS.DeleteBranch(IncomingData.id);
+    res.send("مدرک با موفقیت حذف شد")
+});
+
+
+
+
+
+
 
 
 
