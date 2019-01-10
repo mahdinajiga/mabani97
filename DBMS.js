@@ -25,12 +25,14 @@ var init = function () {
             }]
         });
         SyncBranches();
+        console.log("Nodes directory created...");
+        console.log("Database management service initialized...");
     }
     else
     {
         Branches = JSON.parse(fs.readFileSync(NodesDir + "/Branches.json")).BranchArr;
+        console.log("Database management service initialized...");
     }
-    console.log("Database management service initialized...")
 }
 
 

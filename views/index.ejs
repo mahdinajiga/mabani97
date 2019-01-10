@@ -1,11 +1,18 @@
 <html>
     <head>
-        <title>mabani97</title>
+        <title>mabani97 by MahdiNaji</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <!-- styles from https://www.w3schools.com/howto/howto_js_popup_form.asp-->
         <style>
-            body {font-family: Arial, Roya, Helvetica, sans-serif;}
+            body {font-family: Arial, Roya, Helvetica, sans-serif;
+                background-image:
+                radial-gradient(
+                circle at center left,
+                #13263a,
+                #cce5ff 200%
+                );
+            }
             * {box-sizing: border-box;}
 
             /* Add styles to the form container */
@@ -13,7 +20,44 @@
                 width: 50vw;
                 margin-right : 25vw;
                 padding: 10px;
-                background-color: white;
+            }
+            
+            .shadow{
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            }
+
+            .rightGradient
+            {
+                background-image:
+                radial-gradient(
+                circle at top right,
+                #19334d,
+                #b3d9ff 400%
+                );
+            }
+
+            @media screen and (min-width: 601px) {
+                .form-container {
+                    width: 50vw;
+                    margin-right : 25vw;
+                }
+                .searchFormStyle {
+                    width: 75vw;
+                    margin: auto;
+                }
+            }
+
+            @media screen and (max-width: 600px) {
+                .form-container {
+                    width: 90vw;
+                    margin: auto;
+                }
+                .searchFormStyle {
+                    width: 90%;
+                    margin: auto;
+                }
             }
             
             /* Full-width input fields */
@@ -29,12 +73,27 @@
             /* When the inputs get focus, do something */
             .form-container input[type=text]:focus, .form-container input[type=password]:focus {
                 background-color: #ddd;
-                outline: none;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            }
+
+            h1 {
+                text-shadow: 1px 1px 2px white;
+            }
+
+            span {
+                font-family: Roya;
+                font-size: 20px;
+            }
+            
+            select {
+                height: 22px;
+                border: 0px;
+                background-color: #f1f1f1;
             }
             
             /* Set a style for the submit button */
             .btn {
-                background-color: #e7e7e7;
+                background-color: #f2f2f2;
                 color: black;
                 padding: 16px 20px;
                 border: 1px solid grey;
@@ -58,22 +117,34 @@
                 margin-right: 25%;
                 margin-bottom: 2%;
                 border: 1px solid grey;
+            }
+
+            #splash {
+                display: block;
+                margin: auto;
+                margin-top: 10vh;
+                width: 80%;
+                height: 80%;
+                border: 1px solid grey;
                 border-radius: 5px;
-                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+                padding: 10px;
+                
+                box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
             }
 
             /* loader effects for waitings*/
             .loader {
                 border: 1vw solid #f3f3f3;
                 border-radius: 50%;
-                left: 50%;
-                top: 50%;
+                float: none;
                 border-top: 1vw solid #3498db;
                 margin: 0 auto;
                 width: 9vw;
                 height: 9vw;
                 -webkit-animation: spin 2s linear infinite;
                 animation: spin 2s linear infinite;
+                left: 50%;
+                top: 50%;
             }
 
             @-webkit-keyframes spin {
@@ -97,13 +168,32 @@
         </style>
     </head>
     <body dir="rtl" onload="">
-        <p><h1 style="text-align: center;">سامانه ثبت اطلاعات فارغ التحصیلان دانشگاه تبریز</h1></p>
+
+        <div style="width: 100%; height: 100%; margin-bottom: 30px;">
+        <div id="splash" class="rightGradient">
+        <p><h1 style="text-align: center; font-family: Roya; font-size: 50px;">سامانه ثبت اطلاعات فارغ التحصیلان دانشگاه تبریز</h1></p>
+        <p>
+
+            <button style="width: 80%; margin: 0 10%; font-family: Roya; font-size: 20px;" class="btn" onclick="document.getElementById('searchForm').scrollIntoView({behavior: 'smooth'})">
+                برای جستجوی دوستان یا همکاران خود و مشاهده راه های ارتباطی با آن ها میتوانید آن ها را جستجو کنید<br>
+                بر اساس نام و شماره دانشجویی آن ها یا بر اساس مدرک دانشگاهی آنها<br>
+            </button>
+
+            <button style="width: 80%; margin: 10px 10%; font-family: Roya; font-size: 20px;" class="btn" onclick="document.getElementById('submitForm').scrollIntoView({behavior: 'smooth'})">
+            آیا دانشجو هستید؟؟؟<br>
+            با ارائه کد ملی و شماره دانشجویی میتوانید اطلاعات خود را تغییر دهید<br>
+            در صورت فراموشی کد دانشجویی میتوانید با وارد کردن نام خود کد دانشجویی تان را در اختیار بگیرید<br>
+            برای شروع کلیک کنید</button>
+
+        </p>
+        </div>
+        </div>
 
         
 
         <div id="submitForm">
             <form class="form-container">
-                <h1>ثبت اطلاعات</h1>
+                <h1 style="font-family: Roya;font-size: 50px;">ثبت اطلاعات</h1>
             
                 <label for="BachId"><b>شماره دانشجویی</b></label>
                 <input type="text" placeholder="شماره دانشجویی خود را وارد کنید..." id="BachId" name="BachId" required>
@@ -128,17 +218,7 @@
                 <input type="text" placeholder="09141234567" id="TelNum" name="TelNum" required>
 
                 <label for="Bio"><b>Bio</b></label><br>
-                <textarea style="width: 100%; border: 1px solid grey; border-radius: 5px;" type="text" placeholder="" rows="5" id="Bio" name="Bio"></textarea>
-
-<!--
-                <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px; padding: 10px;">
-                    <label for="degreesForm"><b>مدارک تحصیلی</b></label>
-                    <div style="margin-top: 5vh;" id="degreesForm" name="degreesForm">
-
-                    </div>
-                    <input type="button" style="width: 50%; margin: 10px 25% 10px 25%;" onclick="newDegree()" id="newDegBtn" value="اضافه کردن مدرک تحصیلی" class="btn"/>   
-                </div>
-                -->
+                <textarea style="width: 100%; border: 1px solid grey; border-radius: 5px; background: #f1f1f1; font-family: Roya; font-size: 25px; padding:10px;" type="text" placeholder="" rows="5" id="Bio" name="Bio"></textarea>
                 <input type="button" style="margin-top: 10vh;" onclick="submitUserClicked()" id="submitBtn" value="ثبت" class="btn"/>
             </form>    
         </div>
@@ -148,62 +228,68 @@
 
 
 
-        <div id="searchForm">
-            <form style="width: 75vw; margin: auto;" class="form-container">
-                <h1>جستجوی اطلاعات</h1>
-                <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px; padding: 15px;">
+        <div id="searchForm" class="searchFormStyle">
+            <form style="width: 100%; margin: auto;" class="form-container">
+                <h1 style="font-family: Roya;font-size: 50px;">جستجوی اطلاعات</h1>
+                
+                <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px; padding: 15px;" class="shadow rightGradient" >
                     <input type="text" placeholder="شماره دانشجویی" id="SearchBachId" style="width: 70%; margin-right: 15px;">
                     <input type="button"  onclick="searchConfirmedUserById()" id="submitBtn" value="جستجو بر اساس شماره دانشجویی" class="btn pull-left" style="width: 25%; left = 0px;"/>
                     <a href="/searchByName" target="blank">
                 <button type="button" style="width: 30%; margin: -10px 70% 10px 0%; padding: 5px 5px;" id="BachIdForg" class="btn">
                 جستجو بر اساس نام و نام خانوادگی</button></a>
-                    <div id="BachIdResult">
+                    <div id="BachIdResult" class="shadow">
                 </div>
                 
             </form>    
         </div>
-            
+        
 
-        <div style="width: 75vw; margin: auto; padding: 15px; margin-bottom: 300px;" class="form-container">
-            <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px;">
-                <input type="text" placeholder="جسنجو در بیو" id="SearchBio" style="width: 70%; margin-right: 15px;">
-                <input type="button" onclick="searchConfirmedUserByBio()" id="submitBtn" value="جستجو بر اساس اطلاعات" class="btn pull-left" style="width: 25%; left = 0px;"/>
-                <p>
+        <div class="searchFormStyle">
+            <div style="width: 100%; margin: auto; padding: 15px; margin-bottom: 300px;" class="form-container">
+                <div style="margin-top: 10vh; border: 1px solid grey; border-radius: 5px;" class="shadow rightGradient">
+                    <input type="text" placeholder="جسنجو در بیو" id="SearchBio" style="width: 70%; margin-right: 15px;">
+                    <input type="button" onclick="searchConfirmedUserByBio()" id="submitBtn" value="جستجو بر اساس اطلاعات" class="btn pull-left" style="width: 25%; left = 0px;"/>
+                    <p>
 
-                <span style="margin-right: 10px;"> مدرک </span>
-                <select style="margin-left: 20px;" id="SearchDegreeBranch" onchange="SearchDegreeBranchChanged();">
-                    <option value="-1">مهم نیست</option>
-                <% locals.Branches.forEach(function(Branch) { %>
-                    <option value="<%- Branch['index'] %>"><%- Branch['BranchName'] %></option>
-                <% }); %>
-                </select>
+                    <span style="margin-right: 10px;"> مدرک </span>
+                    <select style="margin-left: 20px;" id="SearchDegreeBranch" onchange="SearchDegreeBranchChanged();">
+                        <option value="-1">مهم نیست</option>
+                    <% locals.Branches.forEach(function(Branch) { %>
+                        <option value="<%- Branch['index'] %>"><%- Branch['BranchName'] %></option>
+                    <% }); %>
+                    </select>
 
-                <span style="margin-right: 10px;"> مقطع </span>
-                <select style="margin-left: 20px;" id="SearchDegreeRank" onchange="SearchDegreeRankChanged();">
-                    <option value="-1">---------</option>
-                </select>
+                    <span style="margin-right: 10px;"> مقطع </span>
+                    <select style="margin-left: 20px;" id="SearchDegreeRank" onchange="SearchDegreeRankChanged();">
+                        <option value="-1">---------</option>
+                    </select>
 
-                <span style="margin-right: 10px;"> گرایش </span>
-                <select style="margin-left: 20px;" id="SearchDegreeOri">
-                    <option value="-1">مهم نیست</option>
-                </select>
-                </p>
-                <p>
-                <span style="margin-right: 10px;"> سال فارغ التحصیلی از  </span>
-                
-                <input type="text" placeholder="20" id="SearchSalEtmamFirst" style="width: 75px; height: 25px; text-align: center;">
-                
-                <span style="margin-right: 10px; margin-left: 10px;"> تا  </span>
+                    <span style="margin-right: 10px;"> گرایش </span>
+                    <select style="margin-left: 20px;" id="SearchDegreeOri">
+                        <option value="-1">مهم نیست</option>
+                    </select>
+                    </p>
+                    <p>
+                    <span style="margin-right: 10px;"> سال فارغ التحصیلی از  </span>
+                    
+                    <input type="text" placeholder="20" id="SearchSalEtmamFirst" style="width: 75px; height: 25px; text-align: center;">
+                    
+                    <span style="margin-right: 10px; margin-left: 10px;"> تا  </span>
 
-                <input type="text" placeholder="98" id="SearchSalEtmamLast" style="width: 75px; height: 25px; text-align: center;">
-                </p>
-                <div id="BioResult" style="display: none; left: 50%; width: 50%; margin-right: 25%; margin-bottom: 2%; border: 1px solid grey; border-radius: 5px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                
+                    <input type="text" placeholder="98" id="SearchSalEtmamLast" style="width: 75px; height: 25px; text-align: center;">
+                    </p>
+                    <div id="BioResult" style="display: none; left: 50%; width: 50%; margin-right: 25%; margin-bottom: 2%; border: 1px solid grey; border-radius: 5px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                    
+                </div>
             </div>
         </div>
 
 
-            <div id="loaderIco" style="display:none; position: fixed;" class="loader"></div>
+                <div id="loaderIco" style="display:none; position: fixed;" class="loader"></div>
+
+
+            
         <script>
             var RawBranchs = '<%- BranchStr %>';
             var Branchs = JSON.parse(RawBranchs);
