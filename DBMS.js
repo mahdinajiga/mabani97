@@ -435,7 +435,35 @@ var SearchUserByName = function () {
                 var Namesimilarity = stringSimilarity.compareTwoStrings(QueryObj.name, BInfo[i].BachName);
                 if(Namesimilarity > MatchThresholde)
                 {
+                    BInfo[i]['sim'] = Number(LNamesimilarity) * Number(Namesimilarity);
                     ReturnObj.push(BInfo[i]);
+                }
+            }
+        }
+    }
+    if(ReturnObj.length>0)
+    {
+        var Sorted=0;
+        while(Sorted==0)
+        {
+            Sorted=1;
+            for(var i=0; i<ReturnObj.length-1; i++)
+            {
+                if(ReturnObj[i].sim<ReturnObj[i+1].sim)
+                {
+                    Sorted=0;
+                    var swSim = ReturnObj[i].sim,
+                        swId = ReturnObj[i].BachId,
+                        swNm = ReturnObj[i].BachName,
+                        swLn = ReturnObj[i].BachLname;
+                    ReturnObj[i].sim = ReturnObj[i+1].sim;
+                    ReturnObj[i].BachId = ReturnObj[i+1].BachId;
+                    ReturnObj[i].BachName = ReturnObj[i+1].BachName;
+                    ReturnObj[i].BachLname = ReturnObj[i+1].BachLname;
+                    ReturnObj[i+1].sim = swSim;
+                    ReturnObj[i+1].BachId = swId;
+                    ReturnObj[i+1].BachName = swNm;
+                    ReturnObj[i+1].BachLname = swLn;
                 }
             }
         }

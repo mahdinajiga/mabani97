@@ -6,6 +6,7 @@
         <!-- styles from https://www.w3schools.com/howto/howto_js_popup_form.asp-->
         <style>
             body {font-family: Arial, Roya, Helvetica, sans-serif;
+                margin: 0; 
                 background-image:
                 radial-gradient(
                 circle at center left,
@@ -13,7 +14,7 @@
                 #cce5ff 200%
                 );
             }
-            * {box-sizing: border-box;}
+            * { box-sizing: border-box;}
 
             /* Add styles to the form container */
             .form-container {
@@ -21,6 +22,11 @@
                 margin-right : 25vw;
                 padding: 10px;
             }
+
+            a {
+                color: #000;
+                text-decoration: none;
+            } 
             
             .shadow{
                 padding: 15px;
@@ -83,6 +89,25 @@
             span {
                 font-family: Roya;
                 font-size: 20px;
+            }
+
+            .SpanShadow 
+            {
+                opacity: 0.8;
+                line-height: 1;
+                padding: 0;
+                text-shadow: -.6px -.5px .7px #fff;
+            }
+
+            #footer {
+                text-align: center;
+                padding-top: 100px;
+                width:100%;
+                height: auto;
+                left:0px;
+                margin-top: 20px;
+                background-color: #13263a;
+                outline: none;
             }
             
             select {
@@ -238,7 +263,7 @@
                     <a href="/searchByName" target="blank">
                 <button type="button" style="width: 30%; margin: -10px 70% 10px 0%; padding: 5px 5px;" id="BachIdForg" class="btn">
                 جستجو بر اساس نام و نام خانوادگی</button></a>
-                    <div id="BachIdResult" class="shadow">
+                    <div id="BachIdResult" class="shadow"></div>
                 </div>
                 
             </form>    
@@ -280,16 +305,19 @@
                     <input type="text" placeholder="98" id="SearchSalEtmamLast" style="width: 75px; height: 25px; text-align: center;">
                     </p>
                     <div id="BioResult" style="display: none; left: 50%; width: 50%; margin-right: 25%; margin-bottom: 2%; border: 1px solid grey; border-radius: 5px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                    
+                    </div>
                 </div>
             </div>
         </div>
 
-
                 <div id="loaderIco" style="display:none; position: fixed;" class="loader"></div>
+        
+        <div id="footer" style="height: 150px;">
+            <a href="http://github.com/mahdinajiga/mabani97"><span style="font-size: 28px;" class="SpanShadow">Mahdi Naji</span></a>
+        </div>
 
 
-            
+
         <script>
             var RawBranchs = '<%- BranchStr %>';
             var Branchs = JSON.parse(RawBranchs);
