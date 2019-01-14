@@ -12,9 +12,7 @@ app.set('views', './views');
 
 DatabaseMS.init('./Nodes'); // calling init() on DBMS
 
-var OptionValues = ["کارشناسی", "کارشناسی ارشد", "دکترا", "فوق دکترا"]; // DegreeTypes
-
-var FirstDegreeDate = 20, LastDegreeDate = 98;
+var FirstDegreeDate = 1320, LastDegreeDate = 1398;
 
 
 
@@ -40,7 +38,7 @@ app.get('/font/Roya.woff', function (req, res) {
 app.get('/', function (req, res) {
     if(req.query.reqid) //look if there is reqid, if there is no reqid, redirect user
     {
-        res.render('index', { options : OptionValues , Branches : DatabaseMS.GetBranches() , BranchStr : JSON.stringify(DatabaseMS.GetBranches()) });
+        res.render('index', { FirstDegreeDate : FirstDegreeDate , LastDegreeDate : LastDegreeDate , Branches : DatabaseMS.GetBranches() , BranchStr : JSON.stringify(DatabaseMS.GetBranches()) });
     }
     else
     {
@@ -84,7 +82,7 @@ app.get('/searchByName', function (req, res) {
 app.get('/uni', function (req, res) {
     if(req.query.reqid)
     {
-        res.render('uni', { options : OptionValues , Branches : DatabaseMS.GetBranches() , BranchStr : JSON.stringify(DatabaseMS.GetBranches()) });
+        res.render('uni', { Branches : DatabaseMS.GetBranches() , BranchStr : JSON.stringify(DatabaseMS.GetBranches()) });
     }
     else
     {
@@ -109,7 +107,7 @@ app.get('/uni', function (req, res) {
 */
 app.post('/degree', function (req, res) {
     var IncomingData = JSON.parse(req.body.Data); // parsing incoming data in JSON
-    res.render('degree', { id: IncomingData.id, options : OptionValues , Branches : DatabaseMS.GetBranches() , BranchStr : JSON.stringify(DatabaseMS.GetBranches()) });
+    res.render('degree', { id: IncomingData.id , Branches : DatabaseMS.GetBranches() , BranchStr : JSON.stringify(DatabaseMS.GetBranches()) });
 });
 
 
